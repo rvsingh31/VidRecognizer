@@ -1,0 +1,9 @@
+ApplyEyeMakeup/v_ApplyEyeMakeup_g01_c01.avi 1
+ApplyEyeMakeup/v_ApplyEyeMakeup_g01_c02.avi 1
+ApplyEyeMakeup/v_ApplyEyeMakeup_g01_c03.avi 1
+ApplyLipstick/v_ApplyLipstick_g01_c01.avi 2
+ApplyLipstick/v_ApplyLipstick_g01_c02.avi 2
+ApplyLipstick/v_ApplyLipstick_g01_c03.avi 2
+Archery/v_Archery_g01_c01.avi 3
+Archery/v_Archery_g01_c02.avi 3
+Archery/v_Archery_g01_c03.avi 3
