@@ -7,7 +7,7 @@ from keras.layers import Input, Conv2D, MaxPooling2D, concatenate, Dropout, Aver
 from keras.models import Model
 from keras import backend as K
 from keras.utils import plot_model
-import pydot
+# import pydot
 import os
 # os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
 
