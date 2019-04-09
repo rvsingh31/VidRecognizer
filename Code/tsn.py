@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 import keras
 from keras.layers import Dropout, Activation, BatchNormalization, Dense, average, Lambda, Concatenate
 from keras.layers import Input, Conv2D, MaxPooling2D, concatenate, Dropout, AveragePooling2D
@@ -12,7 +9,7 @@ from keras import backend as K
 from keras.utils import plot_model
 import pydot
 import os
-os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
+# os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
 
 def conv2d_block(input_tensor, n_filters, kernel_size, strides = (2,2)):
     x = Conv2D(n_filters,(kernel_size,kernel_size), strides = strides, padding = 'same', kernel_initializer='he_normal')(input_tensor)
@@ -117,20 +114,13 @@ def bn_inception(inputs, classes = 101):
     return out
 
 
-# In[2]:
-
-
 def Network(i1,i2,i3):
     o1 = bn_inception(i1)
     o2 = bn_inception(i2)
     o3 = bn_inception(i3)
     out = average([o1, o2, o3])
-    
-#     model = Model(inputs = [i1,i2,i3], outputs =[out])
     return out
 
-
-# In[2]:
 
 
 def TSN():
@@ -151,20 +141,6 @@ def TSN():
     return model
 
 
-# In[ ]:
-
-
-model = TSN()
-
-
-# In[ ]:
-
-
-plot_model(model, to_file='model.png', show_shapes = True)
-
-
-# In[4]:
-
-
-print(model.summary())
+# plot_model(model, to_file='model.png', show_shapes = True)
+# print(model.summary())
 
