@@ -7,7 +7,7 @@ from keras.layers import Input, Conv2D, MaxPooling2D, concatenate, Dropout, Aver
 from keras.models import Model
 from keras import backend as K
 from keras.utils import plot_model
-import pydot
+# import pydot
 import os
 os.environ["PATH"] += os.pathsep + 'C:/Program Files (x86)/Graphviz2.38/bin/'
 
@@ -147,18 +147,18 @@ def Network(i1,i2,i3):
     return out
 
 def TSN():
-    i1 = Input((224,224,1))
-    i2 = Input((224,224,1))
-    i3 = Input((224,224,1))
+    i1 = Input(shape = (224,224,1), name = "input_1")
+    i2 = Input(shape = (224,224,1), name = "input_2")
+    i3 = Input(shape = (224,224,1), name = "input_3")
     outSpatial = Network(i1,i2,i3)
 
 
-    i4 = Input((224,224,2))
-    i5 = Input((224,224,2))
-    i6 = Input((224,224,2))
+    i4 = Input(shape = (224,224,2), name = "input_4")
+    i5 = Input(shape = (224,224,2), name = "input_5")
+    i6 = Input(shape = (224,224,2), name = "input_6")
     outTemporal = Network(i4,i5,i6)
 
-    res = average([outSpatial, outTemporal])
+    res = average([outSpatial, outTemporal], name = 'output')
     model = Model(inputs = [i1,i2,i3,i4,i5,i6], outputs =[res])
     
     return model
