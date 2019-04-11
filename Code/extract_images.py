@@ -6,7 +6,7 @@ import math
 import random
 from collections import defaultdict
 import keras
-from bn_model import TSN
+# from bn_model import TSN
 from keras import backend as K
 
 #Create folder for storing the frames
@@ -26,7 +26,7 @@ def storeFramesAndFlows(framesdir,splitfiledir,splitfile,splitname):
         line = arr[0].split("/")
         action = line[0]
         filename = line[1]
-        if filename.split("_")[2] not in ('g08','g09'):
+        if filename.split("_")[2] not in ('g10','g11','g12') :
             continue
         actionpath = os.path.join(framesdir,splitname,action)
         framepath = os.path.join(actionpath,filename,"frames")
@@ -75,7 +75,7 @@ def storeFramesAndFlows(framesdir,splitfiledir,splitfile,splitname):
             
             nextFrame = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
             cv2.imwrite(framename,image)
-            optical_flow = cv2.opt.DualTVL1OpticalFlow_create()
+            optical_flow = cv2.optflow.DualTVL1OpticalFlow_create()
             flow = optical_flow.calc(prevFrame, nextFrame, None)
             prevFrame = nextFrame
             flow[...,0] = cv2.normalize(flow[...,0],None,0,255,cv2.NORM_MINMAX)
