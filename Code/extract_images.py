@@ -14,7 +14,7 @@ from keras import backend as K
 splitfiledir = r"..\ucfTrainTestlist"
 splitfile = "custom3.txt"
 splitname = splitfile.split('.')[0]
-
+start_idx = 8
 
 def storeFramesAndFlows(framesdir,splitfiledir,splitfile,splitname):
     
@@ -22,9 +22,18 @@ def storeFramesAndFlows(framesdir,splitfiledir,splitfile,splitname):
     lines = open(os.path.join(splitfiledir,splitfile),"r")
     for idx,line in enumerate(lines):
 
+        if idx < start_idx:
+            continue
+
+        fw = open("tmp.txt","w")
+        fw.write(line)
+        fw.write(str(idx))
+        fw.write("\n")
+        fw.close()
+
         print (line)
         print ("IDX:",idx)
-        
+
         arr = line.split(" ")
         vidclass = arr[1] 
         line = arr[0].split("/")
@@ -119,7 +128,7 @@ print ("Extracting images")
 
 if not os.path.exists(os.path.join(framesdir,splitname)):
     os.mkdir(os.path.join(framesdir,splitname))
-    storeFramesAndFlows(framesdir,splitfiledir,splitfile,splitname)
-else:
-    print ("Frames stored already!")
+storeFramesAndFlows(framesdir,splitfiledir,splitfile,splitname)
+# else:
+#     print ("Frames stored already!")
 
