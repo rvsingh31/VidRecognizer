@@ -83,6 +83,7 @@ def inception_block_pass_through(inputs, num1x1, num3x3r, num3x3, num3x3dblr, nu
 
 
 def squeeze(layer):
+    print(layer.shape)
     return K.squeeze(K.squeeze(layer,axis = 1), axis = 1)
 
 
@@ -166,6 +167,54 @@ def TSN():
 # plot_model(model, to_file='model2.png', show_shapes = True)
 # print(model.summary())
 
+
+def squeeze3d(layer):
+    print(layer.shape)
+    return K.squeeze(layer,axis = 1)
+
+
+def conv3d_block(input_tensor, n_filters = 16, kernel_size = 3, strides = (1,1,1)):
+    x = Conv3D(n_filters,(kernel_size, kernel_size, kernel_size), strides = strides, padding = 'same', kernel_initializer='he_normal')(input_tensor)
+    x = BatchNormalization()(x)    
+    x = Activation('relu')(x)
+    return x
+
+
+def convlstm2d_block(input_tensor, n_filters = 64, kernel_size = 3, strides = (1, 1)):
+    x = ConvLSTM2D(filters=n_filters, kernel_size=(kernel_size, kernel_size), strides=strides, padding='same', kernel_initializer='he_normal', recurrent_initializer='he_normal', return_sequences=True)(input_tensor)
+    return x
+
+
+def NetworkC3D(inp, num_classes = 101):
+    c1 = conv3d_block(inp, n_filters = 16)
+    mp1 = MaxPooling3D(pool_size=(2,2,2), padding = 'same')(c1)
+    c2 = conv3d_block(mp1, n_filters = 32)
+    c3 = conv3d_block(c2, n_filters = 32)
+    mp2 = MaxPooling3D(pool_size=(1,2,2), padding = 'same')(c3)
+    c4 = conv3d_block(mp2, n_filters = 64)
+    c5 = conv3d_block(c4, n_filters = 64)
+    c6 = conv3d_block(c5, n_filters = 64)
+    mp3 = MaxPooling3D(pool_size=(1,2,2), padding = 'same')(c6)
+    c7 = conv3d_block(mp3, n_filters = 64)
+    c8 = conv3d_block(c7, n_filters = 64)
+    c9 = conv3d_block(c8, n_filters = 64)
+    mp4 = MaxPooling3D(pool_size=(1,2,2), padding = 'same')(c9)
+    
+    cl1 = convlstm2d_block(mp4)
+    
+    g1 = GlobalAveragePooling3D()(cl1)
+    d1 = Dropout(rate = 0.5)(g1)
+    res = Dense(num_classes, kernel_initializer='he_normal')(d1)
+#    out = Lambda(squeeze3d)(res)
+    out = res
+    return out
+
+
+def C3D_f():
+    inp = Input(shape = (16, 224,224,3), name = "input_1")
+    out = NetworkC3D(inp)
+    model = Model(inputs = [inp], outputs =[out])
+    return model
 
 def C3D():
     # Define model
@@ -256,5 +305,7 @@ def C3D():
     return model
 
 
+model = C3D_f()
+print(model.summary())
 model = C3D()
 print(model.summary())
