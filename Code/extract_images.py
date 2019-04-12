@@ -10,11 +10,11 @@ import keras
 from keras import backend as K
 
 #Create folder for storing the frames
- 
+print (os.getcwd())
 splitfiledir = r"..\ucfTrainTestlist"
 splitfile = "custom3.txt"
 splitname = splitfile.split('.')[0]
-start_idx = 8
+start_idx = 416
 
 def storeFramesAndFlows(framesdir,splitfiledir,splitfile,splitname):
     
@@ -119,9 +119,9 @@ def storeFramesAndFlows(framesdir,splitfiledir,splitfile,splitname):
 
 
 #Store Frames
-framesdir = r"../FramesFlows"
+framesdir = r"..\FramesFlows"
 
-path = r"../../UCF-101"
+path = r"..\..\UCF-101"
 # path = r"E:\capstone_adbi_data\UCF-101"
 
 print ("Extracting images")

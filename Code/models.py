@@ -83,7 +83,6 @@ def inception_block_pass_through(inputs, num1x1, num3x3r, num3x3, num3x3dblr, nu
 
 
 def squeeze(layer):
-    print(layer.shape)
     return K.squeeze(K.squeeze(layer,axis = 1), axis = 1)
 
 
@@ -303,9 +302,3 @@ def C3D():
     model.add(Activation('softmax'))
     
     return model
-
-
-model = C3D_f()
-print(model.summary())
-model = C3D()
-print(model.summary())
