@@ -3,8 +3,8 @@
 
 import keras
 from keras.layers import Dropout, Activation, BatchNormalization, Dense, average, Lambda, Concatenate
-from keras.layers import Input, Conv2D, MaxPooling2D, concatenate, Dropout, AveragePooling2D
-from keras.models import Model
+from keras.layers import Input, Conv2D, MaxPooling2D, concatenate, Dropout, AveragePooling2D, ConvLSTM2D, Conv3D, MaxPooling3D, GlobalAveragePooling3D
+from keras.models import Model, Sequential
 from keras import backend as K
 from keras.utils import plot_model
 # import pydot
@@ -166,3 +166,95 @@ def TSN():
 # plot_model(model, to_file='model2.png', show_shapes = True)
 # print(model.summary())
 
+
+def C3D():
+    # Define model
+    l2=keras.regularizers.l2
+    nb_classes = 101
+    weight_decay = 0.00005
+    patch_size, img_cols, img_rows = 16, 224, 224
+    model = Sequential()
+    model.add(Conv3D(16,(3,3,3),
+                            input_shape=(patch_size, img_cols, img_rows, 3),
+                            activation='relu'))
+    model.add(Conv3D(16,(3,3,3), strides=(1,1,1),padding='same', 
+                        dilation_rate=(1,1,1), kernel_initializer='he_normal',
+                        kernel_regularizer=l2(weight_decay), use_bias=False, 
+                        name='Conv3D_2a_a', activation = 'relu'))
+    model.add(MaxPooling3D(pool_size=(2,2,2)))
+
+
+    model.add(Conv3D(32,(3,3,3), strides=(1,1,1),padding='same', 
+                        dilation_rate=(1,1,1), kernel_initializer='he_normal',
+                        kernel_regularizer=l2(weight_decay), use_bias=False, 
+                        name='Conv3D_2b_a', activation = 'relu'))
+    model.add(Conv3D(32,(3,3,3), strides=(1,1,1),padding='same', 
+                        dilation_rate=(1,1,1), kernel_initializer='he_normal',
+                        kernel_regularizer=l2(weight_decay), use_bias=False, 
+                        name='Conv3D_2b_b', activation = 'relu'))
+    model.add(MaxPooling3D(pool_size=(1, 2,2)))
+
+
+    model.add(Conv3D(64,(3,3,3), strides=(1,1,1),padding='same', 
+                        dilation_rate=(1,1,1), kernel_initializer='he_normal',
+                        kernel_regularizer=l2(weight_decay), use_bias=False, 
+                        name='Conv3D_2c_a', activation = 'relu'))
+    model.add(Conv3D(64,(3,3,3), strides=(1,1,1),padding='same', 
+                        dilation_rate=(1,1,1), kernel_initializer='he_normal',
+                        kernel_regularizer=l2(weight_decay), use_bias=False, 
+                        name='Conv3D_2c_b', activation = 'relu'))
+    model.add(Conv3D(64,(3,3,3), strides=(1,1,1),padding='same', 
+                        dilation_rate=(1,1,1), kernel_initializer='he_normal',
+                        kernel_regularizer=l2(weight_decay), use_bias=False, 
+                        name='Conv3D_2c_c', activation = 'relu'))
+    model.add(MaxPooling3D(pool_size=(1, 2,2)))
+
+
+    model.add(Conv3D(128,(3,3,3), strides=(1,1,1),padding='same', 
+                        dilation_rate=(1,1,1), kernel_initializer='he_normal',
+                        kernel_regularizer=l2(weight_decay), use_bias=False, 
+                        name='Conv3D_2d_a', activation = 'relu'))
+    model.add(Conv3D(128,(3,3,3), strides=(1,1,1),padding='same', 
+                        dilation_rate=(1,1,1), kernel_initializer='he_normal',
+                        kernel_regularizer=l2(weight_decay), use_bias=False, 
+                        name='Conv3D_2d_b', activation = 'relu'))
+    model.add(Conv3D(128,(3,3,3), strides=(1,1,1),padding='same', 
+                        dilation_rate=(1,1,1), kernel_initializer='he_normal',
+                        kernel_regularizer=l2(weight_decay), use_bias=False, 
+                        name='Conv3D_2d_c', activation = 'relu'))
+    model.add(MaxPooling3D(pool_size=(1, 2, 2)))
+
+
+
+    model.add(ConvLSTM2D(filters=64, kernel_size=(3,3),
+                      strides=(1,1),padding='same',
+                          kernel_initializer='he_normal', recurrent_initializer='he_normal',
+                          kernel_regularizer=l2(weight_decay), recurrent_regularizer=l2(weight_decay),
+                          return_sequences=True, name='gatedclstm2d_2'))
+
+    model.add(ConvLSTM2D(filters=64, kernel_size=(3,3),
+                      strides=(1,1),padding='same',
+                          kernel_initializer='he_normal', recurrent_initializer='he_normal',
+                          kernel_regularizer=l2(weight_decay), recurrent_regularizer=l2(weight_decay),
+                          return_sequences=True, name='gatedclstm2d_3'))
+
+    model.add(ConvLSTM2D(filters=64, kernel_size=(3,3),
+                      strides=(1,1),padding='same',
+                          kernel_initializer='he_normal', recurrent_initializer='he_normal',
+                          kernel_regularizer=l2(weight_decay), recurrent_regularizer=l2(weight_decay),
+                          return_sequences=True, name='gatedclstm2d_4'))
+
+
+    #model.add(MaxPooling3D(pool_size=(nb_pool[0], nb_pool[0], nb_pool[0])))
+    #model.add(Flatten())
+    model.add(GlobalAveragePooling3D())
+    model.add(Dropout(0.5))
+    model.add(Dense(nb_classes,kernel_initializer='normal'))
+
+    model.add(Activation('softmax'))
+    
+    return model
+
+
+model = C3D()
+print(model.summary())
