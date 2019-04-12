@@ -107,7 +107,7 @@ def bn_inception1(inputs, classes = 101):
     
     # Global Average
     p3 = AveragePooling2D(pool_size=(7,7))(i5b)
-    
+    p3 = Dropout(rate = 0.5)(p3)
     res = Dense(classes, kernel_initializer='he_normal')(p3)
     out = Lambda(squeeze)(res)
     
@@ -119,7 +119,6 @@ def bn_inception2(inputs, classes = 101):
     p1 = MaxPooling2D(pool_size=(2, 2), padding = 'same')(c1)
     c2a = conv2d_block(p1,64, 1, (1,1))
     c2b = conv2d_block(p1,192, 3, (1,1))
-    p2 = MaxPooling2D(pool_size=(2, 2), padding = 'same')(c2b)
         
     inception3a = inception_block_with_avgpool(c2b, 32, 32, 32, 32, 48, 16)
     inception3b = inception_block_pass_through(inception3a, 0, 64, 80, 32, 48, 0) 
@@ -130,7 +129,7 @@ def bn_inception2(inputs, classes = 101):
 
     # Global Average
     p3 = AveragePooling2D(pool_size=(8,8))(inception5a)
-    
+    p3 = Dropout(rate = 0.5)(p3)
     res = Dense(classes, kernel_initializer='he_normal')(p3)
     out = Lambda(squeeze)(res)
     
@@ -143,7 +142,6 @@ def Network(i1,i2,i3):
     o3 = bn_inception2(i3)
     out = average([o1, o2, o3])
     
-#     model = Model(inputs = [i1,i2,i3], outputs =[out])
     return out
 
 def TSN():
@@ -165,10 +163,6 @@ def TSN():
 
 
 # model = TSN()
-
-
 # plot_model(model, to_file='model2.png', show_shapes = True)
-
-
 # print(model.summary())
 

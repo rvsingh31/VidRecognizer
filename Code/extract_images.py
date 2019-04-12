@@ -12,7 +12,7 @@ from keras import backend as K
 #Create folder for storing the frames
  
 splitfiledir = r"..\ucfTrainTestlist"
-splitfile = "trainlist01.txt"
+splitfile = "custom3.txt"
 splitname = splitfile.split('.')[0]
 
 
@@ -20,14 +20,20 @@ def storeFramesAndFlows(framesdir,splitfiledir,splitfile,splitname):
     
     #Read splitfile
     lines = open(os.path.join(splitfiledir,splitfile),"r")
-    for line in lines:
+    for idx,line in enumerate(lines):
+
+        print (line)
+        print ("IDX:",idx)
+        
         arr = line.split(" ")
         vidclass = arr[1] 
         line = arr[0].split("/")
         action = line[0]
         filename = line[1]
-        if filename.split("_")[2] not in ('g10','g11','g12') :
-            continue
+        # if action not in classes:
+        #     continue
+        # if filename.split("_")[2] not in ('g10','g11','g12'):
+        #     continue
         actionpath = os.path.join(framesdir,splitname,action)
         framepath = os.path.join(actionpath,filename,"frames")
         flowpath = os.path.join(actionpath,filename,"flows")
