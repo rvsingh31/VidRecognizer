@@ -19,7 +19,10 @@ start_idx = 416
 def storeFramesAndFlows(framesdir,splitfiledir,splitfile,splitname):
     
     #Read splitfile
-    lines = open(os.path.join(splitfiledir,splitfile),"r")
+    f = open(os.path.join(splitfiledir,splitfile),"r")
+    lines = f.readlines()
+    f.close()
+    
     for idx,line in enumerate(lines):
 
         if idx < start_idx:
