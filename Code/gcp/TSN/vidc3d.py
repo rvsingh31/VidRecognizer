@@ -197,5 +197,6 @@ def main()
 if name == "__main__":
     test = False
     if test:
-        
-    main()
+        test()
+    else:
+        main()
