@@ -9,8 +9,9 @@ import keras
 from skimage.transform import resize
 from keras import backend as K
 from keras.callbacks import EarlyStopping, ModelCheckpoint, CSVLogger
-from models import c3d_model
+from models import C3D_V2
 from keras.optimizers import SGD
+from keras.models import load_model
 
 
 class dataGenerator(keras.utils.Sequence):
@@ -97,7 +98,9 @@ dgVal = dataGenerator(filenameVal, 16, ffpath)
 
 #Create and Compile model
 K.clear_session()
-model = c3d_model()
+model = C3D_V2()
+
+model_file = "/mnt/disks/disk1/project/weights/c3d/sports1M_weights_tf.h5"
 
 np.random.seed(0)
 create_new = True
@@ -129,7 +132,10 @@ if not create_new and os.path.exists('c3d_model_checkpoints') and len(os.listdir
 else:
 
     sgd = SGD(lr=lr, momentum=0.9, nesterov=True)
+    
     model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
+    model.load_weights(model_file)
+    
     csv_logger = CSVLogger('c3d_training.log')
     #Checkpointing
     filepath="c3d_model_checkpoints/weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
