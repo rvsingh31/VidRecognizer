@@ -59,7 +59,7 @@ class dataGenerator(keras.utils.Sequence):
             Xframes.append(self.getFrames(idxs, imgpath))
             Y.append(batch_y[index])
 
-        finalX, finalY = np.array(Xframes)[:, ::self.DS_FACTOR, ::self.DS_FACTOR], self.one_hot_encode(np.array(Y))
+        finalX, finalY = np.array(Xframes)[:, :, ::self.DS_FACTOR, ::self.DS_FACTOR], self.one_hot_encode(np.array(Y))
         return (finalX,finalY)
     
     def one_hot_encode(self,data, classes = 101):
