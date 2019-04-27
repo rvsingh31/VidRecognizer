@@ -364,8 +364,11 @@ def C3D_V2(summary=False, backend='tf'):
 
 def finalC3D():
     base_model = C3D_V2()
+    for layer in base_model.layers[:-3]:
+        layer.trainable = False
     x = base_model.output
-    res = Dense(101,activation='relu')(x)
+    x = Dropout(.5)(x)
+    res = Dense(101,activation='softmax')(x)
     
     return base_model, Model(inputs=[base_model.input], outputs=[res])
     
@@ -406,5 +409,3 @@ def c3d_model():
 
     model = Model(inputs, x)
     return model
-model = C3D_V2()
-model.summary()

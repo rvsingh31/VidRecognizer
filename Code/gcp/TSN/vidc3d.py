@@ -100,11 +100,11 @@ dgVal = dataGenerator(filenameVal, 16, ffpath)
 K.clear_session()
 base_model, model = finalC3D()
 
-model_file = "/Users/saurabh/workspace/VidRecognizer/weights/c3d/sports1M_weights_tf.h5"
+model_file = "/mnt/disks/disk1/project/weights/c3d/sports1M_weights_tf.h5"
 
 np.random.seed(0)
 create_new = True
-lr = 0.005
+lr = 0.0001
 if not create_new and os.path.exists('c3d_model_checkpoints') and len(os.listdir("c3d_model_checkpoints")) > 0:
     print ("Found saved models")
     mydict = dict()
@@ -135,13 +135,13 @@ else:
     
     base_model.load_weights(model_file)
     model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
-    
+    model.summary() 
     csv_logger = CSVLogger('c3d_training.log')
     #Checkpointing
     filepath="c3d_model_checkpoints/weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
     checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only = True,  mode='max')
     # es = EarlyStopping(monitor='val_acc', mode='max', min_delta=1, patience = 10)
     # callbacks_list = [checkpoint,es]
-    callbacks_list = [checkpoint, csv_logger]
+    callbacks_list = [csv_logger]
 
-    history = model.fit_generator(dgTrain, epochs = 50,validation_data = dgVal)
+    history = model.fit_generator(dgTrain, epochs = 50,validation_data = dgVal, callbacks=callbacks_list)
