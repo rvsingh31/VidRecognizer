@@ -9,7 +9,8 @@ import keras
 from skimage.transform import resize
 from keras import backend as K
 from keras.callbacks import EarlyStopping, ModelCheckpoint, CSVLogger
-from models import C3D
+from models import c3d_model
+from keras.optimizers import SGD
 
 
 class dataGenerator(keras.utils.Sequence):
@@ -96,7 +97,7 @@ dgVal = dataGenerator(filenameVal, 16, ffpath)
 
 #Create and Compile model
 K.clear_session()
-model = C3D()
+model = c3d_model()
 
 np.random.seed(0)
 create_new = True

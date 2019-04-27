@@ -2,9 +2,10 @@
 # coding: utf-8
 
 import keras
-from keras.layers import Dropout, Activation, BatchNormalization, Dense, average, Lambda, Concatenate
-from keras.layers import Input, Conv2D, MaxPooling2D, concatenate, Dropout, AveragePooling2D, ConvLSTM2D, Conv3D, MaxPooling3D, GlobalAveragePooling3D
+from keras.layers import Dropout, Activation, BatchNormalization, Dense, average, Lambda, Concatenate, Flatten
+from keras.layers import Input, Conv2D, MaxPooling2D, concatenate, Dropout, AveragePooling2D, ConvLSTM2D, Conv3D, MaxPooling3D, GlobalAveragePooling3D, MaxPool3D
 from keras.models import Model, Sequential
+from keras.regularizers import l2
 from keras import backend as K
 from keras.utils import plot_model
 # import pydot
@@ -303,56 +304,39 @@ def C3D():
     
     return model
 
-def C3D_V2(summary=False):
-    model = Sequential()
-    # 1st layer group
-    model.add(Convolution3D(64, 3, 3, 3, activation='relu', 
-                            border_mode='same', name='conv1',
-                            subsample=(1, 1, 1), 
-                            input_shape=(3, 16, 112, 112)))
-    model.add(MaxPooling3D(pool_size=(1, 2, 2), strides=(1, 2, 2), 
-                           border_mode='valid', name='pool1'))
-    # 2nd layer group
-    model.add(Convolution3D(128, 3, 3, 3, activation='relu', 
-                            border_mode='same', name='conv2',
-                            subsample=(1, 1, 1)))
-    model.add(MaxPooling3D(pool_size=(2, 2, 2), strides=(2, 2, 2), 
-                           border_mode='valid', name='pool2'))
-    # 3rd layer group
-    model.add(Convolution3D(256, 3, 3, 3, activation='relu', 
-                            border_mode='same', name='conv3a',
-                            subsample=(1, 1, 1)))
-    model.add(Convolution3D(256, 3, 3, 3, activation='relu', 
-                            border_mode='same', name='conv3b',
-                            subsample=(1, 1, 1)))
-    model.add(MaxPooling3D(pool_size=(2, 2, 2), strides=(2, 2, 2), 
-                           border_mode='valid', name='pool3'))
-    # 4th layer group
-    model.add(Convolution3D(512, 3, 3, 3, activation='relu', 
-                            border_mode='same', name='conv4a',
-                            subsample=(1, 1, 1)))
-    model.add(Convolution3D(512, 3, 3, 3, activation='relu', 
-                            border_mode='same', name='conv4b',
-                            subsample=(1, 1, 1)))
-    model.add(MaxPooling3D(pool_size=(2, 2, 2), strides=(2, 2, 2), 
-                           border_mode='valid', name='pool4'))
-    # 5th layer group
-    model.add(Convolution3D(512, 3, 3, 3, activation='relu', 
-                            border_mode='same', name='conv5a',
-                            subsample=(1, 1, 1)))
-    model.add(Convolution3D(512, 3, 3, 3, activation='relu', 
-                            border_mode='same', name='conv5b',
-                            subsample=(1, 1, 1)))
-    model.add(ZeroPadding3D(padding=(0, 1, 1)))
-    model.add(MaxPooling3D(pool_size=(2, 2, 2), strides=(2, 2, 2), 
-                           border_mode='valid', name='pool5'))
-    model.add(Flatten())
-    # FC layers group
-    model.add(Dense(4096, activation='relu', name='fc6'))
-    model.add(Dropout(.5))
-    model.add(Dense(4096, activation='relu', name='fc7'))
-    model.add(Dropout(.5))
-    model.add(Dense(487, activation='softmax', name='fc8'))
-    if summary:
-        print(model.summary())
+def c3d_model():
+    input_shape = (112,112,16,3)
+    weight_decay = 0.005
+    nb_classes = 101
+
+    inputs = Input(input_shape)
+    x = Conv3D(64,(3,3,3),strides=(1,1,1),padding='same',
+               activation='relu',kernel_regularizer=l2(weight_decay))(inputs)
+    x = MaxPool3D((2,2,1),strides=(2,2,1),padding='same')(x)
+
+    x = Conv3D(128,(3,3,3),strides=(1,1,1),padding='same',
+               activation='relu',kernel_regularizer=l2(weight_decay))(x)
+    x = MaxPool3D((2,2,2),strides=(2,2,2),padding='same')(x)
+
+    x = Conv3D(128,(3,3,3),strides=(1,1,1),padding='same',
+               activation='relu',kernel_regularizer=l2(weight_decay))(x)
+    x = MaxPool3D((2,2,2),strides=(2,2,2),padding='same')(x)
+
+    x = Conv3D(256,(3,3,3),strides=(1,1,1),padding='same',
+               activation='relu',kernel_regularizer=l2(weight_decay))(x)
+    x = MaxPool3D((2,2,2),strides=(2,2,2),padding='same')(x)
+
+    x = Conv3D(256, (3, 3, 3), strides=(1, 1, 1), padding='same',
+               activation='relu',kernel_regularizer=l2(weight_decay))(x)
+    x = MaxPool3D((2, 2, 2), strides=(2, 2, 2), padding='same')(x)
+
+    x = Flatten()(x)
+    x = Dense(2048,activation='relu',kernel_regularizer=l2(weight_decay))(x)
+    x = Dropout(0.5)(x)
+    x = Dense(2048,activation='relu',kernel_regularizer=l2(weight_decay))(x)
+    x = Dropout(0.5)(x)
+    x = Dense(nb_classes,kernel_regularizer=l2(weight_decay))(x)
+    x = Activation('softmax')(x)
+
+    model = Model(inputs, x)
     return model
