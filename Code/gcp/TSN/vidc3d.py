@@ -111,7 +111,7 @@ if not create_new and os.path.exists('c3d_model_checkpoints') and len(os.listdir
     model.load_weights(os.path.join("c3d_model_checkpoints",saved_model))
     
     sgd = SGD(lr=lr, momentum=0.9, nesterov=True)
-    model.compile(optimizer=sgd,, loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
     csv_logger = CSVLogger('c3d_training.log')
     #Checkpointing
     filepath="c3d_model_checkpoints/weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
@@ -129,7 +129,7 @@ if not create_new and os.path.exists('c3d_model_checkpoints') and len(os.listdir
 else:
 
     sgd = SGD(lr=lr, momentum=0.9, nesterov=True)
-    model.compile(optimizer=sgd,, loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
     csv_logger = CSVLogger('c3d_training.log')
     #Checkpointing
     filepath="c3d_model_checkpoints/weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
