@@ -75,7 +75,7 @@ class dataGenerator(keras.utils.Sequence):
             f2 = "flow_y_"+str(i)+".jpg"
             grayx = self.readImg(os.path.join(flowspath,f1), "flows")
             grayy = self.readImg(os.path.join(flowspath,f2), "flows")
-            img = np.stack((grayx,grayy),axis = 2)
+            img = np.stack((grayx, grayx, grayy),axis = 2)
             img = np.squeeze(img,axis = 3)
             stack.append(img)
             
@@ -179,10 +179,7 @@ def main(dtype="FRAME"):
 
     #Create and Compile model
     K.clear_session()
-    if dtype == "FRAME":
-        base_model, model = finalI3D(input_shape=(16, 224, 224, 3))
-    else:
-        base_model, model = finalI3D(input_shape=(16, 224, 224, 2))
+    base_model, model = finalI3D(input_shape=(16, 224, 224, 3))
 
 
     np.random.seed(0)
@@ -232,5 +229,5 @@ if __name__ == "__main__":
     if do_test:
         test(dtype="FRAME")
     else:
-        main(dtype="FRAME")
+        main(dtype="FLOW")
 
