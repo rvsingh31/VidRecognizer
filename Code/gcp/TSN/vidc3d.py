@@ -12,7 +12,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint, CSVLogger
 from models import finalC3D
 from keras.optimizers import SGD
 from keras.models import load_model
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, accuracy_score
 
 
 class dataGenerator(keras.utils.Sequence):
@@ -124,14 +124,17 @@ def test():
     
     X, y = dgTest.getTestData()
     
-    y_pred = model.predict_classes(X)
+    y_pred = K.eval(model.predict_classes(X))
+    y_true = K.eval(K.argmax(y, 1))
     
     import gc
     del X
+    del y
     gc.collect()
     
-    y_true = K.argmax(y, 1)
     print(confusion_matrix(y_true, y_pred))
+    print(accuracy_score(y_true, y_pred))
+    
 
     
 def main():
@@ -195,8 +198,8 @@ def main():
         history = model.fit_generator(dgTrain, epochs = 50,validation_data = dgVal, callbacks=callbacks_list)
 
 if name == "__main__":
-    test = False
-    if test:
+    do_test = False
+    if do_test:
         test()
     else:
         main()
