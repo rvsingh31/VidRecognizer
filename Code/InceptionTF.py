@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[4]:
-
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -13,14 +10,8 @@ import tensorflow as tf
 import inception_utils
 
 
-# In[5]:
-
-
 slim = tf.contrib.slim
 trunc_normal = lambda stddev: tf.truncated_normal_initializer(0.0, stddev)
-
-
-# In[3]:
 
 
 def inception_v2_base(inputs,
