@@ -134,7 +134,7 @@ def test():
     print(confusion_matrix(y_true, y_pred))
 
     
-def main()
+def main():
     filenameTrain = "custom3Train.txt"
     filenameVal = "custom3Val.txt"
     ffpath = "FramesFlows/custom3"
