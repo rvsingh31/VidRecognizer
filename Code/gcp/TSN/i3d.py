@@ -73,8 +73,8 @@ class dataGenerator(keras.utils.Sequence):
         for i in idxs:
             f1 = "flow_x_"+str(i)+".jpg"
             f2 = "flow_y_"+str(i)+".jpg"
-            grayx = self.readImg(os.path.join(flowspath,f1), "flows")
-            grayy = self.readImg(os.path.join(flowspath,f2), "flows")
+            grayx = self.readImg(os.path.join(flowspath,f1))
+            grayy = self.readImg(os.path.join(flowspath,f2))
             img = np.stack((grayx, grayx, grayy),axis = 2)
             img = np.squeeze(img,axis = 3)
             stack.append(img)
