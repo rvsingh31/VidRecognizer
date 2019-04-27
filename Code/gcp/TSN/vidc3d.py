@@ -101,7 +101,7 @@ model = c3d_model()
 
 np.random.seed(0)
 create_new = True
-
+lr = 0.005
 if not create_new and os.path.exists('c3d_model_checkpoints') and len(os.listdir("c3d_model_checkpoints")) > 0:
     print ("Found saved models")
     mydict = dict()
