@@ -22,6 +22,7 @@ class dataGenerator(keras.utils.Sequence):
         self.filepath = filepath
         self.ffpath = ffpath
         self.segments = segments
+        self.DS_FACTOR = 2
         
         with open(self.filepath,"r") as f:
             for line in f.readlines():
@@ -57,7 +58,7 @@ class dataGenerator(keras.utils.Sequence):
             Xframes.append(self.getFrames(idxs, imgpath))
             Y.append(batch_y[index])
 
-        finalX, finalY = np.array(Xframes), self.one_hot_encode(np.array(Y))
+        finalX, finalY = np.array(Xframes)[:, ::DS_FACTOR, ::DS_FACTOR], self.one_hot_encode(np.array(Y))
         return (finalX,finalY)
     
     def one_hot_encode(self,data, classes = 101):
