@@ -68,27 +68,11 @@ class dataGenerator(keras.utils.Sequence):
         labels = np.zeros((data.size, classes))
         labels[np.arange(data.size), data - 1] = 1
         return labels
-
-
-    def getFlows(self,idxs, flowspath):
-
-        stack = list()
-        for i in idxs:
-            f1 = "flow_x_"+str(i)+".jpg"
-            f2 = "flow_y_"+str(i)+".jpg"
-            grayx = self.readImg(os.path.join(flowspath,f1), "flows")
-            grayy = self.readImg(os.path.join(flowspath,f2), "flows")
-            img = np.stack((grayx,grayx,grayy),axis = 2)
-            img = np.squeeze(img,axis = 3)
-            stack.append(img)
-            
-        return np.array(stack)
     
     def readImg(self,path):
         img = cv2.imread(path)
         img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
         return img
-    
     
     def getFrames(self,idxs, imgpath):
 
@@ -124,7 +108,8 @@ if not create_new and os.path.exists('c3d_model_checkpoints') and len(os.listdir
     initial_epoch = int(saved_model.split('-')[2])
     model.load_weights(os.path.join("c3d_model_checkpoints",saved_model))
     
-    model.compile(optimizer= keras.optimizers.Adam(lr=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
+    sgd = SGD(lr=lr, momentum=0.9, nesterov=True)
+    model.compile(optimizer=sgd,, loss='categorical_crossentropy', metrics=['accuracy'])
     csv_logger = CSVLogger('c3d_training.log')
     #Checkpointing
     filepath="c3d_model_checkpoints/weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
@@ -141,7 +126,8 @@ if not create_new and os.path.exists('c3d_model_checkpoints') and len(os.listdir
 
 else:
 
-    model.compile(optimizer= keras.optimizers.Adam(lr=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
+    sgd = SGD(lr=lr, momentum=0.9, nesterov=True)
+    model.compile(optimizer=sgd,, loss='categorical_crossentropy', metrics=['accuracy'])
     csv_logger = CSVLogger('c3d_training.log')
     #Checkpointing
     filepath="c3d_model_checkpoints/weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
@@ -150,4 +136,4 @@ else:
     # callbacks_list = [checkpoint,es]
     callbacks_list = [checkpoint, csv_logger]
 
-    history = model.fit_generator(dgTrain, epochs = 50,validation_data = dgVal, callbacks = callbacks_list)
+    history = model.fit_generator(dgTrain, epochs = 50,validation_data = dgVal)
