@@ -12,6 +12,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint, CSVLogger
 from models import finalC3D
 from keras.optimizers import SGD
 from keras.models import load_model
+from sklearn.metrics import confusion_matrix
 
 
 class dataGenerator(keras.utils.Sequence):
@@ -63,6 +64,29 @@ class dataGenerator(keras.utils.Sequence):
         finalX, finalY = np.array(Xframes)[:, :, ::self.DS_FACTOR, ::self.DS_FACTOR], self.one_hot_encode(np.array(Y))
         return (finalX,finalY)
     
+    def getTestData():
+        batch_x = list()
+        batch_y = list()
+        for each in self.idxs:
+            batch_x.append(self.filenames[each])
+            batch_y.append(self.labels[each])
+        
+        Xframes = list()
+        Y = list()
+        for index,each in enumerate(batch_x):
+            infopath = os.path.join(self.ffpath,each,"info.txt")
+            imgpath = os.path.join(self.ffpath,each,"frames")
+            f = open(infopath,"r")
+            total_frames = int(f.readlines()[0].strip().split(':')[1])
+            f.close()
+            idxs = sorted(np.random.randint(0, total_frames, 16))
+            Xframes.append(self.getFrames(idxs, imgpath))
+            Y.append(batch_y[index])
+
+        finalX, finalY = np.array(Xframes)[:, :, ::self.DS_FACTOR, ::self.DS_FACTOR], self.one_hot_encode(np.array(Y))
+        return (finalX,finalY)
+        
+    
     def one_hot_encode(self,data, classes = 101):
         """
         :param data: data to be one hot encoded
@@ -86,62 +110,92 @@ class dataGenerator(keras.utils.Sequence):
             
         return np.array(stack)
 
+def test():
+    filenameTest = "custom3Test.txt"
+    ffpath = "FramesFlows/custom3"
+    dgTest = dataGenerator(filenameTest, 16, ffpath)
 
-filenameTrain = "custom3Train.txt"
-filenameVal = "custom3Val.txt"
-ffpath = "FramesFlows/custom3"
-dgTrain = dataGenerator(filenameTrain, 16, ffpath)
-
-ffpath = os.path.join("FramesFlows/custom3")
-dgVal = dataGenerator(filenameVal, 16, ffpath)
-
-
-#Create and Compile model
-K.clear_session()
-base_model, model = finalC3D()
-
-model_file = "/mnt/disks/disk1/project/weights/c3d/sports1M_weights_tf.h5"
-
-np.random.seed(0)
-create_new = True
-lr = 0.0001
-if not create_new and os.path.exists('c3d_model_checkpoints') and len(os.listdir("c3d_model_checkpoints")) > 0:
-    print ("Found saved models")
-    mydict = dict()
-    sorted_files = sorted(os.listdir("c3d_model_checkpoints"), key = lambda x: int(x.split('-')[2]), reverse = True)
-    saved_model = sorted_files[0]
-    initial_epoch = int(saved_model.split('-')[2])
-    base_model.load_weights(os.path.join("c3d_model_checkpoints",saved_model))
+    #Create and Compile model
+    saved_model_file = "weights-improvement-{}-{}.hdf5".format(str(0), str(0))
+    K.clear_session()
+    _, model = finalC3D()
     
-    sgd = SGD(lr=lr, momentum=0.9, nesterov=True)
-    model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
-    csv_logger = CSVLogger('c3d_training.log')
-    #Checkpointing
-    filepath="c3d_model_checkpoints/weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
-    checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
-    # es = EarlyStopping(monitor='val_acc', mode='max', min_delta=1, patience = 10)
-    # callbacks_list = [checkpoint,es]
-    callbacks_list = [checkpoint, csv_logger]
-
-    print (initial_epoch)
-    print (saved_model)
+    model.load_weights("c3d_model_checkpoints/{}".format(saved_model_file))
     
-    #Fit generator
-    history = model.fit_generator(dgTrain,initial_epoch = initial_epoch, epochs = 100,validation_data = dgVal, callbacks = callbacks_list)
-
-else:
-
-    sgd = SGD(lr=lr, momentum=0.9, nesterov=True)
+    X, y = dgTest.getTestData()
     
-    base_model.load_weights(model_file)
-    model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
-    model.summary() 
-    csv_logger = CSVLogger('c3d_training.log')
-    #Checkpointing
-    filepath="c3d_model_checkpoints/weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
-    checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only = True,  mode='max')
-    # es = EarlyStopping(monitor='val_acc', mode='max', min_delta=1, patience = 10)
-    # callbacks_list = [checkpoint,es]
-    callbacks_list = [csv_logger]
+    y_pred = model.predict_classes(X)
+    
+    import gc
+    del X
+    gc.collect()
+    
+    y_true = K.argmax(y, 1)
+    print(confusion_matrix(y_true, y_pred))
 
-    history = model.fit_generator(dgTrain, epochs = 50,validation_data = dgVal, callbacks=callbacks_list)
+    
+def main()
+    filenameTrain = "custom3Train.txt"
+    filenameVal = "custom3Val.txt"
+    ffpath = "FramesFlows/custom3"
+    dgTrain = dataGenerator(filenameTrain, 16, ffpath)
+
+    ffpath = os.path.join("FramesFlows/custom3")
+    dgVal = dataGenerator(filenameVal, 16, ffpath)
+
+
+    #Create and Compile model
+    K.clear_session()
+    base_model, model = finalC3D()
+
+    model_file = "/mnt/disks/disk1/project/weights/c3d/sports1M_weights_tf.h5"
+
+    np.random.seed(0)
+    create_new = True
+    lr = 0.0001
+    if not create_new and os.path.exists('c3d_model_checkpoints') and len(os.listdir("c3d_model_checkpoints")) > 0:
+        print ("Found saved models")
+        mydict = dict()
+        sorted_files = sorted(os.listdir("c3d_model_checkpoints"), key = lambda x: int(x.split('-')[2]), reverse = True)
+        saved_model = sorted_files[0]
+        initial_epoch = int(saved_model.split('-')[2])
+        base_model.load_weights(os.path.join("c3d_model_checkpoints",saved_model))
+
+        sgd = SGD(lr=lr, momentum=0.9, nesterov=True)
+        model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
+        csv_logger = CSVLogger('c3d_training.log')
+        #Checkpointing
+        filepath="c3d_model_checkpoints/weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
+        checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+        # es = EarlyStopping(monitor='val_acc', mode='max', min_delta=1, patience = 10)
+        # callbacks_list = [checkpoint,es]
+        callbacks_list = [checkpoint, csv_logger]
+
+        print (initial_epoch)
+        print (saved_model)
+
+        #Fit generator
+        history = model.fit_generator(dgTrain,initial_epoch = initial_epoch, epochs = 100,validation_data = dgVal, callbacks = callbacks_list)
+
+    else:
+
+        sgd = SGD(lr=lr, momentum=0.9, nesterov=True)
+
+        base_model.load_weights(model_file)
+        model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
+        model.summary() 
+        csv_logger = CSVLogger('c3d_training.log')
+        #Checkpointing
+        filepath="c3d_model_checkpoints/weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
+        checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only = True,  mode='max')
+        # es = EarlyStopping(monitor='val_acc', mode='max', min_delta=1, patience = 10)
+        # callbacks_list = [checkpoint,es]
+        callbacks_list = [checkpoint, csv_logger]
+
+        history = model.fit_generator(dgTrain, epochs = 50,validation_data = dgVal, callbacks=callbacks_list)
+
+if name == "__main__":
+    test = False
+    if test:
+        
+    main()
