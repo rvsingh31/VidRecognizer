@@ -52,14 +52,15 @@ class dataGenerator(keras.utils.Sequence):
         Y = list()
         for index,each in enumerate(batch_x):
             infopath = os.path.join(self.ffpath,each,"info.txt")
-            imgpath = os.path.join(self.ffpath,each,"frames")
             f = open(infopath,"r")
             total_frames = int(f.readlines()[0].strip().split(':')[1])
             f.close()
             idxs = sorted(np.random.randint(0, total_frames, 16))
             if self.DATA_TYPE == "FRAME":
+                imgpath = os.path.join(self.ffpath,each,"frames")
                 X.append(self.getFrames(idxs, imgpath))
             else:
+                imgpath = os.path.join(self.ffpath,each,"flows")
                 X.append(self.getFlows(idxs, imgpath))
             Y.append(batch_y[index])
 
