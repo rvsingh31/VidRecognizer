@@ -305,7 +305,7 @@ def C3D():
     return model
 
 def c3d_model():
-    input_shape = (112,112,16,3)
+    input_shape = (16,112,112,3)
     weight_decay = 0.005
     nb_classes = 101
 
