@@ -9,7 +9,7 @@ import keras
 from skimage.transform import resize
 from keras import backend as K
 from keras.callbacks import EarlyStopping, ModelCheckpoint, CSVLogger
-from models import C3D_V2
+from models import finalC3D
 from keras.optimizers import SGD
 from keras.models import load_model
 
@@ -98,9 +98,9 @@ dgVal = dataGenerator(filenameVal, 16, ffpath)
 
 #Create and Compile model
 K.clear_session()
-model = C3D_V2()
+base_model, model = finalC3D()
 
-model_file = "/mnt/disks/disk1/project/weights/c3d/sports1M_weights_tf.h5"
+model_file = "/Users/saurabh/workspace/VidRecognizer/weights/c3d/sports1M_weights_tf.h5"
 
 np.random.seed(0)
 create_new = True
@@ -111,7 +111,7 @@ if not create_new and os.path.exists('c3d_model_checkpoints') and len(os.listdir
     sorted_files = sorted(os.listdir("c3d_model_checkpoints"), key = lambda x: int(x.split('-')[2]), reverse = True)
     saved_model = sorted_files[0]
     initial_epoch = int(saved_model.split('-')[2])
-    model.load_weights(os.path.join("c3d_model_checkpoints",saved_model))
+    base_model.load_weights(os.path.join("c3d_model_checkpoints",saved_model))
     
     sgd = SGD(lr=lr, momentum=0.9, nesterov=True)
     model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
@@ -133,8 +133,8 @@ else:
 
     sgd = SGD(lr=lr, momentum=0.9, nesterov=True)
     
+    base_model.load_weights(model_file)
     model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
-    model.load_weights(model_file)
     
     csv_logger = CSVLogger('c3d_training.log')
     #Checkpointing

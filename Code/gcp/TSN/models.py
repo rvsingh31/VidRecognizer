@@ -357,11 +357,18 @@ def C3D_V2(summary=False, backend='tf'):
     model.add(Dropout(.5))
     model.add(Dense(4096, activation='relu', name='fc7'))
     model.add(Dropout(.5))
-    model.add(Dense(487, activation='softmax', name='fc8'))
+    model.add(Dense(487, activation='relu', name='fc8'))
     if summary:
         print(model.summary())
     return model
 
+def finalC3D():
+    base_model = C3D_V2()
+    x = base_model.output
+    res = Dense(101,activation='relu')(x)
+    
+    return base_model, Model(inputs=[base_model.input], outputs=[res])
+    
 
 def c3d_model():
     input_shape = (16,112,112,3)
