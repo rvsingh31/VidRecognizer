@@ -197,7 +197,7 @@ def main():
 
         history = model.fit_generator(dgTrain, epochs = 50,validation_data = dgVal, callbacks=callbacks_list)
 
-if name == "__main__":
+if __name__ == "__main__":
     do_test = False
     if do_test:
         test()
