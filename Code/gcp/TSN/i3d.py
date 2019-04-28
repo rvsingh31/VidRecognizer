@@ -82,7 +82,7 @@ class dataGenerator(keras.utils.Sequence):
             
         return np.array(stack)
     
-    def getTestData():
+    def getTestData(self):
         batch_x = list()
         batch_y = list()
         for each in self.idxs:

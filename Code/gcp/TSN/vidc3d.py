@@ -64,7 +64,7 @@ class dataGenerator(keras.utils.Sequence):
         finalX, finalY = np.array(Xframes)[:, :, ::self.DS_FACTOR, ::self.DS_FACTOR], self.one_hot_encode(np.array(Y))
         return (finalX,finalY)
     
-    def getTestData():
+    def getTestData(self):
         batch_x = list()
         batch_y = list()
         for each in self.idxs:
