@@ -571,6 +571,7 @@ def Inception_Inflated3d(include_top=True,
 
 
 def finalI3D(weights='rgb_imagenet_and_kinetics', input_shape=(16, 224, 224, 3)):
+    K.set_learning_phase(0)
     base_model = Inception_Inflated3d(
                 include_top=True,
                 weights=weights,
@@ -578,6 +579,7 @@ def finalI3D(weights='rgb_imagenet_and_kinetics', input_shape=(16, 224, 224, 3))
                 classes=400)
     for layer in base_model.layers:
         layer.trainable = False
+    K.set_learning_phase(1)
     x = base_model.output
     x = Dropout(.5)(x)
     res = Dense(101,activation='softmax')(x)
