@@ -124,7 +124,7 @@ def test():
     
     X, y = dgTest.getTestData()
     
-    y_pred = K.eval(model.predict_classes(X))
+    y_pred = K.eval(K.argmax(model.predict(X), 1))
     y_true = K.eval(K.argmax(y, 1))
     
     import gc
