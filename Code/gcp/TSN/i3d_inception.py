@@ -214,7 +214,7 @@ def conv3d_bn(x,
             bn_axis = 1
         else:
             bn_axis = 4
-        x = BatchNormalization(axis=bn_axis, scale=False, name=bn_name, training=False)(x)
+        x = BatchNormalization(axis=bn_axis, scale=False, name=bn_name)(x, training=False)
 
     if use_activation_fn:
         x = Activation('relu', name=name)(x)

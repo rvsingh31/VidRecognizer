@@ -229,5 +229,5 @@ if __name__ == "__main__":
     if do_test:
         test(dtype="FRAME")
     else:
-        main(dtype="FLOW")
+        main(dtype="FRAME")
 
