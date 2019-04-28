@@ -55,7 +55,7 @@ class dataGenerator(keras.utils.Sequence):
             f = open(infopath,"r")
             total_frames = int(f.readlines()[0].strip().split(':')[1])
             f.close()
-            idxs = sorted(np.random.randint(0, total_frames, 16))
+            idxs = sorted(np.random.randint(1, total_frames, 16))
             if self.DATA_TYPE == "FRAME":
                 imgpath = os.path.join(self.ffpath,each,"frames")
                 X.append(self.getFrames(idxs, imgpath))
@@ -77,7 +77,7 @@ class dataGenerator(keras.utils.Sequence):
             grayx = self.readImg(os.path.join(flowspath,f1))
             grayy = self.readImg(os.path.join(flowspath,f2))
             img = np.stack((grayx, grayx, grayy),axis = 2)
-            img = np.squeeze(img,axis = 3)
+            img = np.squeeze(img,axis = 3
             stack.append(img)
             
         return np.array(stack)
@@ -120,6 +120,8 @@ class dataGenerator(keras.utils.Sequence):
     def readImg(self,path):
         img = cv2.imread(path)
         img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+        if self.DATA_TYPE != "FRAME":
+            img = resize(img,(img.shape[0],img.shape[1],1))
         return img
     
     def getFrames(self,idxs, imgpath):
