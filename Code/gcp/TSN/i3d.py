@@ -150,17 +150,14 @@ def test():
     modelFlow.load_weights("i3d_model_checkpoints/flow/{}".format(saved_model_flow))
     
     XFrame, y = dgTest.dgTestFrame()
-    y_pred_frame = K.eval(K.argmax(modelFrame.predict(XFrame), 1))
+    y_pred_frame = K.argmax(modelFrame.predict(XFrame), 1)
+    y_pred_frame = K.eval(y_pred_frame)
     
     y_true = K.eval(K.argmax(y, 1))
     
-    import gc
-    del XFrame
-    del y
-    gc.collect()
-    
     XFlow, _ = dgTest.dgTestFrame()
-    y_pred_flow = K.eval(K.argmax(modelFlow.predict(XFlow), 1))
+    y_pred_flow = K.argmax(modelFlow.predict(XFlow), 1)
+    y_pred_flow = K.eval(y_pred_flow)
 
     del XFlow
     gc.collect()

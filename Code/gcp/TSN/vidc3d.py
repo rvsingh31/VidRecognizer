@@ -124,13 +124,10 @@ def test():
     
     X, y = dgTest.getTestData()
     
-    y_pred = K.eval(K.argmax(model.predict(X), 1))
-    y_true = K.eval(K.argmax(y, 1))
-    
-    import gc
-    del X
-    del y
-    gc.collect()
+    y_pred = K.argmax(model.predict(X), 1)
+    y_true = K.argmax(y, 1)
+    y_pred = K.eval(y_pred)
+    y_true = K.eval(y_true)
     
     print(confusion_matrix(y_true, y_pred))
     print(accuracy_score(y_true, y_pred))
