@@ -77,7 +77,7 @@ class dataGenerator(keras.utils.Sequence):
             grayx = self.readImg(os.path.join(flowspath,f1))
             grayy = self.readImg(os.path.join(flowspath,f2))
             img = np.stack((grayx, grayx, grayy),axis = 2)
-            img = np.squeeze(img,axis = 3
+            img = np.squeeze(img,axis = 3)
             stack.append(img)
             
         return np.array(stack)
