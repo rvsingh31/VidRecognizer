@@ -93,20 +93,16 @@ class dataGenerator(keras.utils.Sequence):
         Y = list()
         for index,each in enumerate(batch_x):
             infopath = os.path.join(self.ffpath,each,"info.txt")
-            imgpath = os.path.join(self.ffpath,each,"frames")
             f = open(infopath,"r")
             total_frames = int(f.readlines()[0].strip().split(':')[1])
             f.close()
-            idxs = sorted(np.random.randint(0, total_frames, 16))
+            idxs = sorted(np.random.randint(1, total_frames, 16))
             if self.DATA_TYPE == "FRAME":
+                imgpath = os.path.join(self.ffpath,each,"frames")
                 X.append(self.getFrames(idxs, imgpath))
             else:
-                try:
-                    imgpath = os.path.join(self.ffpath,each,"flows")
-                    X.append(self.getFlows(idxs, imgpath))
-                except:
-                    print(each, imgpath)
-                    pass
+                imgpath = os.path.join(self.ffpath,each,"flows")
+                X.append(self.getFlows(idxs, imgpath))
             Y.append(batch_y[index])
 
         finalX, finalY = np.array(X), self.one_hot_encode(np.array(Y))
@@ -147,28 +143,40 @@ def test():
     #Create and Compile model
     saved_model_frame = "weights-improvement-{}-{}.hdf5".format('23', '0.89')
     saved_model_flow = "weights-improvement-{}-{}.hdf5".format('37', '0.75')
+
     K.clear_session()
     _, modelFrame = finalI3D(input_shape=(16, 224, 224, 3))
-    _, modelFlow = finalI3D(input_shape=(16, 224, 224, 3))
-    
     modelFrame.load_weights("i3d_model_checkpoints/frame/{}".format(saved_model_frame))
-    modelFlow.load_weights("i3d_model_checkpoints/flow/{}".format(saved_model_flow))
-    
     XFrame, y = dgTestFrame.getTestData()
     y_pred_frame = K.argmax(modelFrame.predict(XFrame), 1)
     y_pred_frame = K.eval(y_pred_frame)
-    
     y_true = K.eval(K.argmax(y, 1))
     
+    print("FRAME")
+    print(confusion_matrix(y_true, y_pred_frame))
+    print(accuracy_score(y_true, y_pred_frame)
+    
+    import gc
+    del XFrame
+    del y
+    del modelFrame
+    gc.collect()
+
+    K.clear_session()
+    _, modelFlow = finalI3D(input_shape=(16, 224, 224, 3))
+    modelFlow.load_weights("i3d_model_checkpoints/flow/{}".format(saved_model_flow))
     XFlow, _ = dgTestFlow.getTestData()
     y_pred_flow = K.argmax(modelFlow.predict(XFlow), 1)
     y_pred_flow = K.eval(y_pred_flow)
+    print("FLOW")
+    print(confusion_matrix(y_true, y_pred_flow))
+    print(accuracy_score(y_true, y_pred_flow)
 
-    import gc
     del XFlow
-    del XFrame
+    del modelFlow
     gc.collect()
     
+    print("OVERALL")
     print(confusion_matrix(y_true, (y_pred_flow + y_pred_frame)/2.))
     print(accuracy_score(y_true, (y_pred_flow + y_pred_frame)/2.))
     
