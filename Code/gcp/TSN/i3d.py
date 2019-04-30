@@ -101,7 +101,12 @@ class dataGenerator(keras.utils.Sequence):
             if self.DATA_TYPE == "FRAME":
                 X.append(self.getFrames(idxs, imgpath))
             else:
-                X.append(self.getFlows(idxs, imgpath))
+                try:
+                    imgpath = os.path.join(self.ffpath,each,"flows")
+                    X.append(self.getFlows(idxs, imgpath))
+                except:
+                    print(each, imgpath)
+                    pass
             Y.append(batch_y[index])
 
         finalX, finalY = np.array(X), self.one_hot_encode(np.array(Y))
@@ -140,26 +145,28 @@ def test():
     dgTestFlow = dataGenerator(filenameTest, 16, ffpath, data_type="FLOW")
 
     #Create and Compile model
-    saved_model_frame = "weights-improvement-{}-{}.hdf5".format('', '')
-    saved_model_flow = "weights-improvement-{}-{}.hdf5".format('', '')
+    saved_model_frame = "weights-improvement-{}-{}.hdf5".format('23', '0.89')
+    saved_model_flow = "weights-improvement-{}-{}.hdf5".format('37', '0.75')
     K.clear_session()
     _, modelFrame = finalI3D(input_shape=(16, 224, 224, 3))
-    _, modelFlow = finalI3D(input_shape=(16, 224, 224, 2))
+    _, modelFlow = finalI3D(input_shape=(16, 224, 224, 3))
     
     modelFrame.load_weights("i3d_model_checkpoints/frame/{}".format(saved_model_frame))
     modelFlow.load_weights("i3d_model_checkpoints/flow/{}".format(saved_model_flow))
     
-    XFrame, y = dgTest.dgTestFrame()
+    XFrame, y = dgTestFrame.getTestData()
     y_pred_frame = K.argmax(modelFrame.predict(XFrame), 1)
     y_pred_frame = K.eval(y_pred_frame)
     
     y_true = K.eval(K.argmax(y, 1))
     
-    XFlow, _ = dgTest.dgTestFrame()
+    XFlow, _ = dgTestFlow.getTestData()
     y_pred_flow = K.argmax(modelFlow.predict(XFlow), 1)
     y_pred_flow = K.eval(y_pred_flow)
 
+    import gc
     del XFlow
+    del XFrame
     gc.collect()
     
     print(confusion_matrix(y_true, (y_pred_flow + y_pred_frame)/2.))
@@ -181,18 +188,23 @@ def main(dtype="FRAME"):
     K.clear_session()
     base_model, model = finalI3D(input_shape=(16, 224, 224, 3))
 
+    
 
     np.random.seed(0)
     create_new = True
-    lr = 0.0001
+    lr = 0.01
+    learning_rate = lr
+    decay_rate = learning_rate / epochs
     if not create_new and os.path.exists('i3d_model_checkpoints') and len(os.listdir("i3d_model_checkpoints")) > 0:
         print ("Found saved models")
-        mydict = dict()
-        sorted_files = sorted(os.listdir("i3d_model_checkpoints"), key = lambda x: int(x.split('-')[2]), reverse = True)
-        saved_model = sorted_files[0]
-        initial_epoch = int(saved_model.split('-')[2])
+        #mydict = dict()
+        #sorted_files = sorted(os.listdir("i3d_model_checkpoints"), key = lambda x: int(x.split('-')[2]), reverse = True)
+        saved_model = "i3d_model_checkpoints/flow/weights-improvement-07-0.06.hdf5"
+        model.load_weights(saved_model)
+        #saved_model = sorted_files[0]
+        initial_epoch = 7
 
-        sgd = SGD(lr=lr, momentum=0.9, nesterov=True)
+        sgd = SGD(lr=lr, momentum=0.9, nesterov=True, decay_rate=decay_rate)
         model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
         csv_logger = CSVLogger('i3d_training.log')
         #Checkpointing
@@ -210,7 +222,7 @@ def main(dtype="FRAME"):
 
     else:
 
-        sgd = SGD(lr=lr, momentum=0.9, nesterov=True)
+        sgd = SGD(lr=lr, momentum=0.9, nesterov=True, decay_rate=decay_rate)
 
         model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
         model.summary() 
@@ -225,9 +237,9 @@ def main(dtype="FRAME"):
         history = model.fit_generator(dgTrain, epochs = 50,validation_data = dgVal, callbacks=callbacks_list)
 
 if __name__ == "__main__":
-    do_test = False
+    do_test = True
     if do_test:
-        test(dtype="FRAME")
+        test()
     else:
-        main(dtype="FRAME")
+        main(dtype="FLOW")
 
