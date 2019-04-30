@@ -31,30 +31,37 @@ def TSN():
         bm1 = InceptionResNetV2(input_tensor = i1, weights='imagenet', include_top=False)
         x = bm1.output
         x = GlobalAveragePooling2D()(x)
-        x = Dropout(rate = 0.2)(x)
+        x = Dropout(rate = 0.5)(x)
         sp1 = Dense(101, activation='softmax')(x)
-        for layer in bm1.layers:
+        for layer in bm1.layers[:-1]:
             layer.trainable = False
+            if isinstance(layer, keras.layers.normalization.BatchNormalization):
+                layer.trainable = False
 
     with K.name_scope('SpatialLayer2'):
         i2 = Input(shape = (224,224,3), name = "input_2")
         bm2 = InceptionResNetV2(input_tensor = i2, weights='imagenet', include_top=False)
         x = bm2.output
         x = GlobalAveragePooling2D()(x)
-        x = Dropout(rate = 0.2)(x)
+        x = Dropout(rate = 0.5)(x)
         sp2 = Dense(101, activation='softmax')(x)
-        for layer in bm2.layers:
+        for layer in bm2.layers[:-1]:
             layer.trainable = False
+            if isinstance(layer, keras.layers.normalization.BatchNormalization):
+                layer.trainable = False
+
 
     with K.name_scope('SpatialLayer3'):
         i3 = Input(shape = (224,224,3), name = "input_3")
         bm3 = InceptionResNetV2(input_tensor = i3, weights='imagenet', include_top=False)
         x = bm3.output
         x = GlobalAveragePooling2D()(x)
-        x = Dropout(rate = 0.2)(x)
+        x = Dropout(rate = 0.5)(x)
         sp3 = Dense(101, activation='softmax')(x)
-        for layer in bm3.layers:
+        for layer in bm3.layers[:-1]:
             layer.trainable = False
+            if isinstance(layer, keras.layers.normalization.BatchNormalization):
+                layer.trainable = False
 
     out1 = average([sp1, sp2, sp3])
 
@@ -65,30 +72,39 @@ def TSN():
         bm4 = InceptionResNetV2(input_tensor = i4, weights='imagenet', include_top=False)
         x = bm4.output
         x = GlobalAveragePooling2D()(x)
-        x = Dropout(rate = 0.2)(x)
+        x = Dropout(rate = 0.5)(x)
         sp4 = Dense(101, activation='softmax')(x)
-        for layer in bm4.layers:
+        for layer in bm4.layers[:-1]:
             layer.trainable = False
+            if isinstance(layer, keras.layers.normalization.BatchNormalization):
+                layer.trainable = False
+
 
     with K.name_scope('TemporalLayer2'):
         i5 = Input(shape = (224,224,3), name = "input_5")
         bm5 = InceptionResNetV2(input_tensor = i5, weights='imagenet', include_top=False)
         x = bm5.output
         x = GlobalAveragePooling2D()(x)
-        x = Dropout(rate = 0.2)(x)
+        x = Dropout(rate = 0.5)(x)
         sp5 = Dense(101, activation='softmax')(x)
-        for layer in bm5.layers:
+        for layer in bm5.layers[:-1]:
             layer.trainable = False
+            if isinstance(layer, keras.layers.normalization.BatchNormalization):
+                layer.trainable = False
+
 
     with K.name_scope('TemporalLayer3'):   
         i6 = Input(shape = (224,224,3), name = "input_6")
         bm6 = InceptionResNetV2(input_tensor = i6, weights='imagenet', include_top=False)
         x = bm6.output
         x = GlobalAveragePooling2D()(x)
-        x = Dropout(rate = 0.2)(x)
+        x = Dropout(rate = 0.5)(x)
         sp6 = Dense(101, activation='softmax')(x)
-        for layer in bm6.layers:
+        for layer in bm6.layers[:-1]:
             layer.trainable = False
+            if isinstance(layer, keras.layers.normalization.BatchNormalization):
+                layer.trainable = False
+
 
     out2 = average([sp4, sp5, sp6])
 
@@ -98,6 +114,6 @@ def TSN():
 
     return model
 
-# model = TSN()
+model = TSN()
 # plot_model(model, to_file='pretrained_model_iv2.png', show_shapes = True)
-# print(model.summary())
+print(model.summary()) 
