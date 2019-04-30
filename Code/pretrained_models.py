@@ -33,10 +33,10 @@ def TSN():
         x = GlobalAveragePooling2D()(x)
         x = Dropout(rate = 0.5)(x)
         sp1 = Dense(101, activation='softmax')(x)
-        # for layer in bm1.layers[:-2]:
-        #     layer.trainable = False
-        #     if isinstance(layer, keras.layers.normalization.BatchNormalization):
-        #         layer.trainable = False
+        for layer in bm1.layers[:-1]:
+            layer.trainable = False
+            if isinstance(layer, keras.layers.normalization.BatchNormalization):
+                layer.trainable = False
 
     with K.name_scope('SpatialLayer2'):
         i2 = Input(shape = (224,224,3), name = "input_2")
@@ -45,10 +45,10 @@ def TSN():
         x = GlobalAveragePooling2D()(x)
         x = Dropout(rate = 0.5)(x)
         sp2 = Dense(101, activation='softmax')(x)
-        # for layer in bm2.layers[:-2]:
-        #     layer.trainable = False
-        #     if isinstance(layer, keras.layers.normalization.BatchNormalization):
-        #         layer.trainable = False
+        for layer in bm2.layers[:-1]:
+            layer.trainable = False
+            if isinstance(layer, keras.layers.normalization.BatchNormalization):
+                layer.trainable = False
 
 
     with K.name_scope('SpatialLayer3'):
@@ -58,10 +58,10 @@ def TSN():
         x = GlobalAveragePooling2D()(x)
         x = Dropout(rate = 0.5)(x)
         sp3 = Dense(101, activation='softmax')(x)
-        # for layer in bm3.layers[:-2]:
-        #     layer.trainable = False
-        #     if isinstance(layer, keras.layers.normalization.BatchNormalization):
-        #         layer.trainable = False
+        for layer in bm3.layers[:-1]:
+            layer.trainable = False
+            if isinstance(layer, keras.layers.normalization.BatchNormalization):
+                layer.trainable = False
 
     out1 = average([sp1, sp2, sp3])
 
@@ -74,10 +74,10 @@ def TSN():
         x = GlobalAveragePooling2D()(x)
         x = Dropout(rate = 0.5)(x)
         sp4 = Dense(101, activation='softmax')(x)
-        # for layer in bm4.layers[:-2]:
-        #     layer.trainable = False
-        #     if isinstance(layer, keras.layers.normalization.BatchNormalization):
-        #         layer.trainable = False
+        for layer in bm4.layers[:-1]:
+            layer.trainable = False
+            if isinstance(layer, keras.layers.normalization.BatchNormalization):
+                layer.trainable = False
 
 
     with K.name_scope('TemporalLayer2'):
@@ -87,10 +87,10 @@ def TSN():
         x = GlobalAveragePooling2D()(x)
         x = Dropout(rate = 0.5)(x)
         sp5 = Dense(101, activation='softmax')(x)
-        # for layer in bm5.layers[:-2]:
-        #     layer.trainable = False
-        #     if isinstance(layer, keras.layers.normalization.BatchNormalization):
-        #         layer.trainable = False
+        for layer in bm5.layers[:-1]:
+            layer.trainable = False
+            if isinstance(layer, keras.layers.normalization.BatchNormalization):
+                layer.trainable = False
 
 
     with K.name_scope('TemporalLayer3'):   
@@ -100,10 +100,10 @@ def TSN():
         x = GlobalAveragePooling2D()(x)
         x = Dropout(rate = 0.5)(x)
         sp6 = Dense(101, activation='softmax')(x)
-        # for layer in bm6.layers[:-2]:
-        #     layer.trainable = False
-        #     if isinstance(layer, keras.layers.normalization.BatchNormalization):
-        #         layer.trainable = False
+        for layer in bm6.layers[:-1]:
+            layer.trainable = False
+            if isinstance(layer, keras.layers.normalization.BatchNormalization):
+                layer.trainable = False
 
 
     out2 = average([sp4, sp5, sp6])
