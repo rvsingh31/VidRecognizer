@@ -17,11 +17,12 @@ from sklearn.metrics import confusion_matrix, accuracy_score
 
 class dataGenerator(keras.utils.Sequence):
 
-    def __init__(self, filepath, batch_size, ffpath, segments = 16, test=False, data_type="FRAME"):
+    def __init__(self, filepath, batch_size, ffpath, test_batch_size=32, segments = 16, test=False, data_type="FRAME"):
         np.random.seed(0)
         self.filenames = list()
         self.labels = list()
         self.batch_size = batch_size
+        self.test_batch_size = test_batch_size
         self.filepath = filepath
         self.ffpath = ffpath
         self.segments = segments
@@ -81,6 +82,36 @@ class dataGenerator(keras.utils.Sequence):
             stack.append(img)
             
         return np.array(stack)
+    
+    def getLengthFileNames():
+        return len(self.filenames)
+    
+    def getTestDataBatch(self, idx):
+        this_batch = self.idxs[idx * self.test_batch_size:min((idx + 1) * self.test_batch_size, len(self.filenames))]
+        batch_x = list()
+        batch_y = list()
+        for each in this_batch:
+            batch_x.append(self.filenames[each])
+            batch_y.append(self.labels[each])
+        
+        X = list()
+        Y = list()
+        for index,each in enumerate(batch_x):
+            infopath = os.path.join(self.ffpath,each,"info.txt")
+            f = open(infopath,"r")
+            total_frames = int(f.readlines()[0].strip().split(':')[1])
+            f.close()
+            idxs = sorted(np.random.randint(1, total_frames, 16))
+            if self.DATA_TYPE == "FRAME":
+                imgpath = os.path.join(self.ffpath,each,"frames")
+                X.append(self.getFrames(idxs, imgpath))
+            else:
+                imgpath = os.path.join(self.ffpath,each,"flows")
+                X.append(self.getFlows(idxs, imgpath))
+            Y.append(batch_y[index])
+        
+        finalX, finalY = np.array(X), self.one_hot_encode(np.array(Y))
+        return (finalX,finalY)
     
     def getTestData(self):
         batch_x = list()
@@ -164,12 +195,19 @@ def test():
     K.clear_session()
     _, modelFlow = finalI3D(input_shape=(16, 224, 224, 3))
     modelFlow.load_weights("i3d_model_checkpoints/flow/{}".format(saved_model_flow))
-    XFlow, _ = dgTestFlow.getTestData()
-    y_pred_flow = K.argmax(modelFlow.predict(XFlow), 1)
-    y_pred_flow = K.eval(y_pred_flow)
+    avg_acc_scores = []
+    for i in range(dgTestFlow.getLengthFileNames()):
+        XFlow, _ = dgTestFlow.getTestDataBatch(i)
+        y_pred_flow = K.argmax(modelFlow.predict(XFlow), 1)
+        y_pred_flow = K.eval(y_pred_flow)
+        avg_acc_scores.append(accuracy_score(y_true, y_pred_flow))
+        print(confusion_matrix(y_true, y_pred_flow))
+        print(avg_acc_scores[-1])
+        i += 36
+    
     print("FLOW")
-    print(confusion_matrix(y_true, y_pred_flow))
-    print(accuracy_score(y_true, y_pred_flow))
+    print(avg_acc_score)
+    print(sum(avg_acc_scores)/len(avg_acc_scores))
 
     del XFlow
     del modelFlow
