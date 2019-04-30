@@ -154,8 +154,7 @@ def test():
     
     print("FRAME")
     print(confusion_matrix(y_true, y_pred_frame))
-    print(accuracy_score(y_true, y_pred_frame)
-    
+    print(accuracy_score(y_true, y_pred_frame))
     import gc
     del XFrame
     del y
@@ -170,7 +169,7 @@ def test():
     y_pred_flow = K.eval(y_pred_flow)
     print("FLOW")
     print(confusion_matrix(y_true, y_pred_flow))
-    print(accuracy_score(y_true, y_pred_flow)
+    print(accuracy_score(y_true, y_pred_flow))
 
     del XFlow
     del modelFlow
