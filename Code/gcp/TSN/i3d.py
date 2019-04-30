@@ -68,10 +68,8 @@ class dataGenerator(keras.utils.Sequence):
 
         finalX, finalY = np.array(X), self.one_hot_encode(np.array(Y))
         return (finalX,finalY)
-
     
     def getFlows(self,idxs, flowspath):
-
         stack = list()
         for i in idxs:
             f1 = "flow_x_"+str(i)+".jpg"
@@ -180,20 +178,20 @@ def test():
     _, modelFlow = finalI3D(input_shape=(16, 224, 224, 3))
     modelFlow.load_weights("i3d_model_checkpoints/flow/{}".format(saved_model_flow))
     batch_size = 36
-    avg_acc_scores = []
-    for i in range(dgTestFlow.getLengthFileNames()):
+    y_pred_flow = []
+    y_true = []
+    for i in range(dgTestFlow.getLengthFileNames()/batch_size):
         XFlow, y = dgTestFlow.getTestDataBatch(i)
-        y_pred_flow = K.argmax(modelFlow.predict(XFlow), 1)
-        y_pred_flow = K.eval(y_pred_flow)
-        y_true = K.eval(K.argmax(y, 1))
-        avg_acc_scores.append(accuracy_score(y_true, y_pred_flow))
-        print(confusion_matrix(y_true, y_pred_flow))
-        print(avg_acc_scores[-1])
-        i += batch_size
+        y_pred_flow_batch = K.argmax(modelFlow.predict(XFlow), 1)
+        y_pred_flow.extend(K.eval(y_pred_flow_batch))
+        y_true.extend(K.eval(K.argmax(y, 1)))
+        print(i)
 
     print("FLOW")
-    print(avg_acc_score)
-    print(sum(avg_acc_scores)/len(avg_acc_scores))
+    print(len(y_pred_flow), len(y_true))
+    y_pred_flow, y_true = np.array(y_pred_flow), np.array(y_true)
+    print(confusion_matrix(y_true, y_pred_flow))
+    print(accuracy_score(y_true, y_pred_flow))
 
     del XFlow
     del modelFlow
@@ -218,8 +216,8 @@ def test():
 
     
     print("OVERALL")
-    print(confusion_matrix(y_true, (y_pred_flow + y_pred_frame)/2.))
-    print(accuracy_score(y_true, (y_pred_flow + y_pred_frame)/2.))
+    print(confusion_matrix(y_true, np.round((y_pred_flow + y_pred_frame)/2)))
+    print(accuracy_score(y_true, np.round((y_pred_flow + y_pred_frame)/2)))
     
 
     
