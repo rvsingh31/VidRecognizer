@@ -83,7 +83,7 @@ class dataGenerator(keras.utils.Sequence):
             
         return np.array(stack)
     
-    def getLengthFileNames():
+    def getLengthFileNames(self):
         return len(self.filenames)
     
     def getTestDataBatch(self, idx):
@@ -195,15 +195,16 @@ def test():
     K.clear_session()
     _, modelFlow = finalI3D(input_shape=(16, 224, 224, 3))
     modelFlow.load_weights("i3d_model_checkpoints/flow/{}".format(saved_model_flow))
+    batch_size = 36
     avg_acc_scores = []
     for i in range(dgTestFlow.getLengthFileNames()):
         XFlow, _ = dgTestFlow.getTestDataBatch(i)
         y_pred_flow = K.argmax(modelFlow.predict(XFlow), 1)
         y_pred_flow = K.eval(y_pred_flow)
-        avg_acc_scores.append(accuracy_score(y_true, y_pred_flow))
+        avg_acc_scores.append(accuracy_score(y_true[idx:idx+batch_size], y_pred_flow))
         print(confusion_matrix(y_true, y_pred_flow))
         print(avg_acc_scores[-1])
-        i += 36
+        i += batch_size
     
     print("FLOW")
     print(avg_acc_score)
