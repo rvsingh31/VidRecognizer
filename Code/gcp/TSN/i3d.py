@@ -180,7 +180,7 @@ def test():
     batch_size = 36
     y_pred_flow = []
     y_true = []
-    for i in range(dgTestFlow.getLengthFileNames()/batch_size):
+    for i in range(dgTestFlow.getLengthFileNames()//batch_size):
         XFlow, y = dgTestFlow.getTestDataBatch(i)
         y_pred_flow_batch = K.argmax(modelFlow.predict(XFlow), 1)
         y_pred_flow.extend(K.eval(y_pred_flow_batch))
@@ -216,8 +216,8 @@ def test():
 
     
     print("OVERALL")
-    print(confusion_matrix(y_true, np.round((y_pred_flow + y_pred_frame)/2)))
-    print(accuracy_score(y_true, np.round((y_pred_flow + y_pred_frame)/2)))
+    print(confusion_matrix(y_true, (y_pred_flow + y_pred_frame)//2))
+    print(accuracy_score(y_true, (y_pred_flow + y_pred_frame)//2))
     
 
     
