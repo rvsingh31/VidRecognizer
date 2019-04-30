@@ -18,7 +18,7 @@ import gc
 
 class dataGenerator(keras.utils.Sequence):
 
-    def __init__(self, filepath, batch_size, ffpath, test_batch_size=32, segments = 16, test=False, data_type="FRAME"):
+    def __init__(self, filepath, batch_size, ffpath, test_batch_size=36, segments = 16, test=False, data_type="FRAME"):
         np.random.seed(0)
         self.filenames = list()
         self.labels = list()
