@@ -13,6 +13,7 @@ from i3d_inception import finalI3D
 from keras.optimizers import SGD
 from keras.models import load_model
 from sklearn.metrics import confusion_matrix, accuracy_score
+import gc
 
 
 class dataGenerator(keras.utils.Sequence):
@@ -176,6 +177,29 @@ def test():
     saved_model_flow = "weights-improvement-{}-{}.hdf5".format('37', '0.75')
 
     K.clear_session()
+    _, modelFlow = finalI3D(input_shape=(16, 224, 224, 3))
+    modelFlow.load_weights("i3d_model_checkpoints/flow/{}".format(saved_model_flow))
+    batch_size = 36
+    avg_acc_scores = []
+    for i in range(dgTestFlow.getLengthFileNames()):
+        XFlow, y = dgTestFlow.getTestDataBatch(i)
+        y_pred_flow = K.argmax(modelFlow.predict(XFlow), 1)
+        y_pred_flow = K.eval(y_pred_flow)
+        y_true = K.eval(K.argmax(y, 1))
+        avg_acc_scores.append(accuracy_score(y_true, y_pred_flow))
+        print(confusion_matrix(y_true, y_pred_flow))
+        print(avg_acc_scores[-1])
+        i += batch_size
+
+    print("FLOW")
+    print(avg_acc_score)
+    print(sum(avg_acc_scores)/len(avg_acc_scores))
+
+    del XFlow
+    del modelFlow
+    gc.collect()
+    
+    K.clear_session()
     _, modelFrame = finalI3D(input_shape=(16, 224, 224, 3))
     modelFrame.load_weights("i3d_model_checkpoints/frame/{}".format(saved_model_frame))
     XFrame, y = dgTestFrame.getTestData()
@@ -186,33 +210,12 @@ def test():
     print("FRAME")
     print(confusion_matrix(y_true, y_pred_frame))
     print(accuracy_score(y_true, y_pred_frame))
-    import gc
+
     del XFrame
     del y
     del modelFrame
     gc.collect()
 
-    K.clear_session()
-    _, modelFlow = finalI3D(input_shape=(16, 224, 224, 3))
-    modelFlow.load_weights("i3d_model_checkpoints/flow/{}".format(saved_model_flow))
-    batch_size = 36
-    avg_acc_scores = []
-    for i in range(dgTestFlow.getLengthFileNames()):
-        XFlow, _ = dgTestFlow.getTestDataBatch(i)
-        y_pred_flow = K.argmax(modelFlow.predict(XFlow), 1)
-        y_pred_flow = K.eval(y_pred_flow)
-        avg_acc_scores.append(accuracy_score(y_true[idx:idx+batch_size], y_pred_flow))
-        print(confusion_matrix(y_true, y_pred_flow))
-        print(avg_acc_scores[-1])
-        i += batch_size
-    
-    print("FLOW")
-    print(avg_acc_score)
-    print(sum(avg_acc_scores)/len(avg_acc_scores))
-
-    del XFlow
-    del modelFlow
-    gc.collect()
     
     print("OVERALL")
     print(confusion_matrix(y_true, (y_pred_flow + y_pred_frame)/2.))
