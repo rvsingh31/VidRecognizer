@@ -248,7 +248,7 @@ if len(sys.argv) > 1:
             initial_epoch = int(saved_model.split('-')[2])
             model.load_weights(os.path.join("tsn_model_checkpoints",saved_model))
             Xtest, ytest = dgTest.getTestData()
-            ytrue = K.argmax(ytest,1)
+            ytrue = K.argmax(ytest['output'],1)
             ypred = model.predict_classes(Xtest)
             print ("Testing Accuracy:",accuracy_score(K.eval(ytest), ypred))
         else:
