@@ -249,8 +249,9 @@ if len(sys.argv) > 1:
             model.load_weights(os.path.join("tsn_model_checkpoints",saved_model))
             Xtest, ytest = dgTest.getTestData()
             ytrue = K.argmax(ytest['output'],1)
-            ypred = model.predict_classes(Xtest)
-            print ("Testing Accuracy:",accuracy_score(K.eval(ytest), ypred))
+            ypred = model.predict(Xtest)
+            ypred = K.argmax(ypred,1)
+            print ("Testing Accuracy:",accuracy_score(K.eval(ytrue), K.eval(ypred)))
         else:
             print ("No saved models. Please train first")
 
