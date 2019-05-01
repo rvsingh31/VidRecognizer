@@ -189,7 +189,7 @@ if len(sys.argv) > 1:
 
     filenameTrain = "custom3Train.txt"
     filenameVal = "custom3Val.txt"
-    filenameVal = "custom3Test.txt"
+    filenameTest = "custom3Test.txt"
     ffpath = "FramesFlows/custom3"
 
     dgTrain = dataGenerator(filenameTrain,16,ffpath)
