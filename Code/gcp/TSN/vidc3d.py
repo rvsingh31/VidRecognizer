@@ -110,10 +110,31 @@ class dataGenerator(keras.utils.Sequence):
             
         return np.array(stack)
 
+
+def getTestDataForPrediction(filename, batch, ffpath):
+    infopath = os.path.join(ffpath,filename,"info.txt")
+    imgpath = os.path.join(ffpath,filename,"frames")
+    f = open(infopath,"r")
+    total_frames = int(f.readlines()[0].strip().split(':')[1])
+    ground_truth = int(f.readlines()[1].strip().split(':')[1])
+    f.close()
+    Xframes = list()
+    for idx in math.ceil(total_frames/batch):
+        idxs = list(range(idx*batch, min((idx+1)*batch,total_frames)))
+        Xframes.append(dataGenerator.getFrames(idxs,imgpath))
+        
+    finalX, ground_truth = np.array(Xframes)[:, :, ::self.DS_FACTOR, ::self.DS_FACTOR], ground_truth
+
+
+
 def test():
-    filenameTest = "custom3Test.txt"
+    # filenameTest = "custom3Test.txt"
+    # ffpath = "FramesFlows/custom3"
+    # dgTest = dataGenerator(filenameTest, 16, ffpath)
+    filenameTest = "GolfSwing/v_GolfSwing_g17_c01.avi"
+    # filenameTest = "TableTennisShot/v_TableTennisShot_g21_c01.avi"
     ffpath = "FramesFlows/custom3"
-    dgTest = dataGenerator(filenameTest, 16, ffpath)
+    X,y = getTestDataForPrediction(filenameTest, 16, ffpath)
 
     #Create and Compile model
     saved_model_file = "weights-improvement-{}-{}.hdf5".format(str(20), str(0.81))
@@ -121,17 +142,12 @@ def test():
     _, model = finalC3D()
     
     model.load_weights("weights/c3d/{}".format(saved_model_file))
-    
-    X, y = dgTest.getTestData()
-    
+        
     y_pred = K.argmax(model.predict(X), 1)
-    y_true = K.argmax(y, 1)
     y_pred = K.eval(y_pred)
-    y_true = K.eval(y_true)
     
-    print(confusion_matrix(y_true, y_pred))
-    print(accuracy_score(y_true, y_pred))
-    
+    print (y)
+    print (y_pred)
 
     
 def main():
