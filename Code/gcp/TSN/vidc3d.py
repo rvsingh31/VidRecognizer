@@ -115,8 +115,9 @@ def getTestDataForPrediction(filename, batch, ffpath):
     infopath = os.path.join(ffpath,filename,"info.txt")
     imgpath = os.path.join(ffpath,filename,"frames")
     f = open(infopath,"r")
-    total_frames = int(f.readlines()[0].strip().split(':')[1])
-    ground_truth = int(f.readlines()[1].strip().split(':')[1])
+    lines = f.readlines()
+    total_frames = int(lines[0].strip().split(':')[1])
+    ground_truth = int(lines[1].strip().split(':')[1])
     f.close()
     Xframes = list()
     for idx in math.ceil(total_frames/batch):
