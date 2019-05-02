@@ -120,12 +120,12 @@ def getTestDataForPrediction(filename, batch, ffpath):
     ground_truth = int(lines[1].strip().split(':')[1])
     f.close()
     Xframes = list()
-    for idx in math.ceil(total_frames/batch):
+    for idx in range(math.ceil(total_frames/batch)):
         idxs = list(range(idx*batch, min((idx+1)*batch,total_frames)))
         Xframes.append(dataGenerator.getFrames(idxs,imgpath))
         
-    finalX, ground_truth = np.array(Xframes)[:, :, ::self.DS_FACTOR, ::self.DS_FACTOR], ground_truth
-
+    finalX = np.array(Xframes)[:, :, ::self.DS_FACTOR, ::self.DS_FACTOR]
+    return finalX, ground_truth
 
 
 def test():
