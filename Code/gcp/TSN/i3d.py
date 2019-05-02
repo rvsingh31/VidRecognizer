@@ -238,20 +238,21 @@ def main(dtype="FRAME"):
     
 
     np.random.seed(0)
-    create_new = True
-    lr = 0.01
+    create_new = False
+    epochs = 100
+    lr = 0.1
     learning_rate = lr
     decay_rate = learning_rate / epochs
     if not create_new and os.path.exists('i3d_model_checkpoints') and len(os.listdir("i3d_model_checkpoints")) > 0:
         print ("Found saved models")
         #mydict = dict()
         #sorted_files = sorted(os.listdir("i3d_model_checkpoints"), key = lambda x: int(x.split('-')[2]), reverse = True)
-        saved_model = "i3d_model_checkpoints/flow/weights-improvement-07-0.06.hdf5"
+        saved_model = "i3d_model_checkpoints/flow/weights-improvement-37-0.75.hdf5"
         model.load_weights(saved_model)
         #saved_model = sorted_files[0]
-        initial_epoch = 7
+        initial_epoch = 37
 
-        sgd = SGD(lr=lr, momentum=0.9, nesterov=True, decay_rate=decay_rate)
+        sgd = SGD(lr=lr, momentum=0.9, nesterov=True, decay=decay_rate)
         model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
         csv_logger = CSVLogger('i3d_training.log')
         #Checkpointing
@@ -265,11 +266,11 @@ def main(dtype="FRAME"):
         print (saved_model)
 
         #Fit generator
-        history = model.fit_generator(dgTrain,initial_epoch = initial_epoch, epochs = 100,validation_data = dgVal, callbacks = callbacks_list)
+        history = model.fit_generator(dgTrain,initial_epoch = initial_epoch, epochs = epochs,validation_data = dgVal, callbacks = callbacks_list)
 
     else:
 
-        sgd = SGD(lr=lr, momentum=0.9, nesterov=True, decay_rate=decay_rate)
+        sgd = SGD(lr=lr, momentum=0.9, nesterov=True, decay=decay_rate)
 
         model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
         model.summary() 
@@ -284,7 +285,7 @@ def main(dtype="FRAME"):
         history = model.fit_generator(dgTrain, epochs = 50,validation_data = dgVal, callbacks=callbacks_list)
 
 if __name__ == "__main__":
-    do_test = True
+    do_test = False
     if do_test:
         test()
     else:
