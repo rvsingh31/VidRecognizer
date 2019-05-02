@@ -116,11 +116,11 @@ def test():
     dgTest = dataGenerator(filenameTest, 16, ffpath)
 
     #Create and Compile model
-    saved_model_file = "weights-improvement-{}-{}.hdf5".format(str(0), str(0))
+    saved_model_file = "weights-improvement-{}-{}.hdf5".format(str(20), str(0.81))
     K.clear_session()
     _, model = finalC3D()
     
-    model.load_weights("c3d_model_checkpoints/{}".format(saved_model_file))
+    model.load_weights("weights/c3d/{}".format(saved_model_file))
     
     X, y = dgTest.getTestData()
     
@@ -195,7 +195,7 @@ def main():
         history = model.fit_generator(dgTrain, epochs = 50,validation_data = dgVal, callbacks=callbacks_list)
 
 if __name__ == "__main__":
-    do_test = False
+    do_test = True
     if do_test:
         test()
     else:
