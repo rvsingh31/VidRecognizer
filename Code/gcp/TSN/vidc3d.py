@@ -139,7 +139,7 @@ def getTestDataForPrediction(filename, batch, ffpath):
         idxs = list(range(idx*batch, min((idx+1)*batch,total_frames)))
         Xframes.append(getFrames(idxs,imgpath))
         
-    finalX = np.array(Xframes)[:, :, ::self.DS_FACTOR, ::self.DS_FACTOR]
+    finalX = np.array(Xframes)[:, :, ::2, ::2]
     return finalX, ground_truth
 
 
