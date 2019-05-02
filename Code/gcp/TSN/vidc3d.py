@@ -135,10 +135,9 @@ def getTestDataForPrediction(filename, batch, ffpath):
     ground_truth = int(lines[1].strip().split(':')[1])
     f.close()
     Xframes = list()
-    for idx in range(math.ceil(total_frames/batch)):
+    for idx in range(math.floor(total_frames/batch)):
         idxs = list(range(idx*batch, min((idx+1)*batch,total_frames)))
         Xframes.append(getFrames(idxs,imgpath))
-        
     finalX = np.array(Xframes)[:, :, ::2, ::2]
     return finalX, ground_truth
 
@@ -147,8 +146,8 @@ def test():
     # filenameTest = "custom3Test.txt"
     # ffpath = "FramesFlows/custom3"
     # dgTest = dataGenerator(filenameTest, 16, ffpath)
-    filenameTest = "GolfSwing/v_GolfSwing_g17_c01.avi"
-    # filenameTest = "TableTennisShot/v_TableTennisShot_g21_c01.avi"
+    #filenameTest = "GolfSwing/v_GolfSwing_g17_c01.avi"
+    filenameTest = "TableTennisShot/v_TableTennisShot_g21_c01.avi"
     ffpath = "FramesFlows/custom3"
     X,y = getTestDataForPrediction(filenameTest, 16, ffpath)
 
@@ -158,14 +157,15 @@ def test():
     _, model = finalC3D()
     
     model.load_weights("weights/c3d/{}".format(saved_model_file))
-        
-    y_pred = K.argmax(model.predict(X), 1)
+    predictions = model.predict(X)        
+    y_pred = K.argmax(predictions, 1)
     y_pred = K.eval(y_pred)
     
     print (y)
     print (y_pred)
+    print ([predictions[idx][x] for idx,x in enumerate(y_pred)])
 
-    
+
 def main():
     filenameTrain = "custom3Train.txt"
     filenameVal = "custom3Val.txt"
