@@ -111,6 +111,21 @@ class dataGenerator(keras.utils.Sequence):
         return np.array(stack)
 
 
+
+def readImg(path):
+    img = cv2.imread(path)
+    img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+    return img
+
+def getFrames(idxs, imgpath):
+
+    stack = list()
+    for i in idxs:
+        framename = "frame_"+str(i)+".jpg"
+        stack.append(readImg(os.path.join(imgpath,framename)))
+        
+    return np.array(stack)
+
 def getTestDataForPrediction(filename, batch, ffpath):
     infopath = os.path.join(ffpath,filename,"info.txt")
     imgpath = os.path.join(ffpath,filename,"frames")
@@ -122,7 +137,7 @@ def getTestDataForPrediction(filename, batch, ffpath):
     Xframes = list()
     for idx in range(math.ceil(total_frames/batch)):
         idxs = list(range(idx*batch, min((idx+1)*batch,total_frames)))
-        Xframes.append(dataGenerator.getFrames(idxs,imgpath))
+        Xframes.append(getFrames(idxs,imgpath))
         
     finalX = np.array(Xframes)[:, :, ::self.DS_FACTOR, ::self.DS_FACTOR]
     return finalX, ground_truth
