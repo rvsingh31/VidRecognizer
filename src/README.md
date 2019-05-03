@@ -31,17 +31,18 @@ Our biggest challenge was to work on such a big dataset with limited resources w
 
 As mentioned before, we implemented three models. Out of which, we were able to train two models successfully given the timeframe we had and multiple implementation issues we faced, the reasons of which can be found in our project report[ADD REPORT IN REPO] [here](../Report.pdf).
 
-1. **C3D**: C3D's implementation consists of two files: <br/>
-    * *models.py*: This file contains the architecture of the model
-    * *vidc3d.py*: This file is the driver program for training/testing the model. It expects **one** command-line argument which is to mentioned whether to *'train'* or *'test'* the model.<br/>
+### C3D
 
-    In order the run this file for training, it expects a pre-defined weights file which we have provided[ADD WEIGHT FILE IN REPO] [here](trained_model_weights/sports1M_weights_tf.h5). Once, you have the weights in your local system, give appropriate location in the script. After that, you also have to specify the location of your pre-processed videos, the splitfile to use for training in order to create a proper data generator for training. Once, all these steps are done, you can train the model by the following command. <br/>
-        ``` python3 vidc3d.py train ```
+C3D's implementation consists of two files:
+1. *models.py*: This file contains the architecture of the model
+2. *vidc3d.py*: This file is the driver program for training/testing the model. It expects **one** command-line argument which is to mentioned whether to *'train'* or *'test'* the model.
+    In order the run this file for training, it expects a pre-defined weights file which we have provided[ADD WEIGHT FILE IN REPO] [here](trained_model_weights/sports1M_weights_tf.h5). Once, you have the weights in your local system, give appropriate location in the script. After that, you also have to specify the location of your pre-processed videos, the splitfile to use for training in order to create a proper data generator for training. Once, all these steps are done, you can train the model by the following command.
+    ``` python3 vidc3d.py train ```
 
-        In order to test the model over any specific video, you have to specify two things in the *test* function.
-        * which weights to use for testing - can be found [here](trained_model_weights/c3d).
+    In order to test the model over any specific video, you have to specify two things in the *test* function.
+         which weights to use for testing - can be found [here](trained_model_weights/c3d).
         * which videofiles to test - Can be a single video or can be multiple. Uncommenting specific lines will do the task.
 
-        Once you do the above mentioned steps, you can test the model by the following command. <br/>
+    Once you do the above mentioned steps, you can test the model by the following command.
 
-        ``` python3 vidc3d.py test ``` 
+    ``` python3 vidc3d.py test ``` 
