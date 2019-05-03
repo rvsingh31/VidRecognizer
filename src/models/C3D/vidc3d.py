@@ -3,6 +3,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+import sysconfig
 import random
 from collections import defaultdict
 import keras
@@ -227,8 +228,8 @@ def main():
         history = model.fit_generator(dgTrain, epochs = 50,validation_data = dgVal, callbacks=callbacks_list)
 
 if __name__ == "__main__":
-    do_test = True
-    if do_test:
+    do_test = sys.argv[1]
+    if do_test == "test":
         test()
     else:
         main()
