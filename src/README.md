@@ -18,6 +18,8 @@ The following is a brief description of the sub-directories present in this dire
 
 * **papers**: These are some reference papers which we referred during the course of this project
 
+* **report_and_presentation** : This directory contains our report and presentation for this project
+
 * **random_scripts**: This directory contains some random scripts which were used for generating plots with intermediate results and relevant error checking.
 
 * **models**: In all, we implemented 3 architectures in this project. This directory contains 3 sub-directories namely *I3D*, *C3D*, *TSN*. Each of these directories contains the code for the respective model.
