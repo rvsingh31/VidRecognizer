@@ -12,7 +12,7 @@ The following is a brief description of the sub-directories present in this dire
 
 * **data_and_exploration**: 
     - *dataset*: Contains the dataset used for training and testing the constructed models. The dataset which we are referencing here is a textfile containing a split of the original dataset over which various architectures have provided their benchmarks. Using the same split helped us compare our results with the already established architectures.
-    You can download the videos from [here](https://www.crcv.ucf.edu/data/UCF101/UCF101.rar). It also contains a README.md file which describes the dataset we constructed for this project using the original dataset.
+    You can download the videos from [here](https://www.crcv.ucf.edu/data/UCF101/UCF101.rar). It also contains a [README.md](data_and_exploration/dataset/README.md) file which describes the dataset we constructed for this project using the original dataset.
     
     - *extract_images.py*: In order to work on videos, we performed preprocessing part where we stored all the frames, their optical flows and some relevant information on disk. This file helped us with that pre-processing part.
     - *generateDataset.py*: This file was used for shuffling and creating custom datasets with equal distribution over all classes using the predefined splits.
