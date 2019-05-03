@@ -29,6 +29,8 @@ The following is a brief description of the sub-directories present in this dire
 * **results**: 
 	- *Video_Outputs*: This directory contains some videos with our models' results embedded in them. The embedded text shows the action predicted by C3D model alongwith the confidence the model has for that action.
 	- It also contains a loss curve for studying TSN's behavior and archived results text documents for reference.
+    - *write_video_prediction.py* : This file is used to embed action and confidence for a single to create a presentable video.
+    - *plots* : This directory contains various plots of model's performance while training.
 
 ## Use of Google Cloud Platform 
 
