@@ -1,6 +1,6 @@
 # VidRecognizer
 
-## Perform Video Classification on UCF101 Dataset
+## Perform Video Classification and Action recognition on UCF101 Dataset
 
 This project aims at classifying videos and perform activity recognition over the dataset provided by [UCF](https://www.crcv.ucf.edu/data/UCF101.php). The dataset contains approximately 11K videos distributed as 101 actions.<br/>
 
