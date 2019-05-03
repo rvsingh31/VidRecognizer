@@ -31,7 +31,7 @@ we have a script wherein you need to mention 2 things:
 
 The script will store all the information in a folder named after the splitfile in a directory "FRAMESFLOWS". (You can always change it in the script)
 
-The script can be found [here](\src\data_and_exploration\extract_images.py)
+The script can be found [here](../extract_images.py)
 
 
 The script expects 3 command-line arguments:
