@@ -60,6 +60,7 @@ Once you do the above mentioned steps, you can test the model by the following c
 
 ### I3D
 
+Our I3D implementation is adapted from [Keras Kinetics I3D](https://github.com/dlpbc/keras-kinetics-i3d). We use pre-trained weights for this model that can be downloaded from within the script. Please read script comments to follow that. Specifically, our model used this pre-trained weight: 'rgb_imagenet_and_kinetics'. The same model is used for both Frame training and flow, we can use the argument as described below to proceed further.
 Implementation of I3D consists of two files:
 * *i3d_inception.py* : This file contains the architecture of the model
 * *i3d.py* : This file is the driver program for training/testing the model. It expects two command-line argument:
