@@ -229,7 +229,7 @@ def main():
 
 if __name__ == "__main__":
     do_test = sys.argv[1]
-    if do_test == "test":
+    if str(do_test) == "test":
         test()
     else:
         main()

@@ -285,9 +285,8 @@ def main(dtype="FRAME"):
         history = model.fit_generator(dgTrain, epochs = 50,validation_data = dgVal, callbacks=callbacks_list)
 
 if __name__ == "__main__":
-    do_test = False
-    if do_test:
+    do_test = sys.argv[1]
+    if str(do_test) == "test":
         test()
     else:
-        main(dtype="FLOW")
-
+        main(dtype=str(sys.argv[2]))

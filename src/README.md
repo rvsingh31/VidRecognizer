@@ -19,8 +19,8 @@ The following is a brief description of the sub-directories present in this dire
 * **training_logs**: This directory contains the outputs of CSVLogger for all the models during the training phase.
 
 * **results**: 
-    - *Video_Outputs*: This directory contains some videos with our models' results embedded in them. The embedded text shows the action predicted by C3D model alongwith the confidence the model has for that action.
-    - It also contains a loss curve for studying TSN's behavior and archived results text documents for reference.
+	- *Video_Outputs*: This directory contains some videos with our models' results embedded in them. The embedded text shows the action predicted by C3D model alongwith the confidence the model has for that action.
+	- It also contains a loss curve for studying TSN's behavior and archived results text documents for reference.
 
 ## Use of Google Cloud Platform 
 
@@ -33,17 +33,59 @@ As mentioned before, we implemented three models. Out of which, we were able to 
 
 ### C3D
 
-C3D's implementation consists of two files:
-1. *models.py*: This file contains the architecture of the model
-2. *vidc3d.py*: This file is the driver program for training/testing the model. It expects **one** command-line argument which is to mentioned whether to *'train'* or *'test'* the model.
-    In order the run this file for training, it expects a pre-defined weights file which we have provided[ADD WEIGHT FILE IN REPO] [here](trained_model_weights/sports1M_weights_tf.h5). Once, you have the weights in your local system, give appropriate location in the script. After that, you also have to specify the location of your pre-processed videos, the splitfile to use for training in order to create a proper data generator for training. Once, all these steps are done, you can train the model by the following command.
-    
-    ``` python3 vidc3d.py train ```
+Implementation of C3D consists of two files:
+* *models.py* : This file contains the architecture of the model
+* *vidc3d.py* : This file is the driver program for training/testing the model. It expects one command-line argument which is to mentioned whether to *'train'* or *'test'* the model.
 
-    In order to test the model over any specific video, you have to specify two things in the *test* function.
-         which weights to use for testing - can be found [here](trained_model_weights/c3d).
-        * which videofiles to test - Can be a single video or can be multiple. Uncommenting specific lines will do the task.
+In order the run this file for training, it expects a pre-defined weights file which we have provided [here](trained_model_weights/c3d). Once, you have the weights in your local system, give appropriate location in the script. After that, you also have to specify the location of your pre-processed videos, the splitfile to use for training in order to create a proper data generator for training. Once, all these steps are done, you can train the model by the following command.
 
-    Once you do the above mentioned steps, you can test the model by the following command.
+ ``` python3 vidc3d.py train ```
 
-    ``` python3 vidc3d.py test ``` 
+In order to test the model over any specific video, you have to specify two things in the *test* function.
+   * which weights to use for testing - can be found [here](trained_model_weights/c3d).
+   * which videofiles to test - Can be a single video or can be multiple. Uncommenting specific lines will do the task.
+
+Once you do the above mentioned steps, you can test the model by the following command.
+
+ ``` python3 vidc3d.py test ``` 
+
+
+### I3D
+
+Implementation of I3D consists of two files:
+* *i3d_inception.py* : This file contains the architecture of the model
+* *i3d.py* : This file is the driver program for training/testing the model. It expects two command-line argument:
+	*  First argument is to mention whether to *'train'* or *'test'* the model.
+	* Second argument is optional in case of testing. For training,  you need to specify what part of video to train on ie. *'FLOW'* or *'FRAME'*.
+
+As mentioned above in the implementation of C3D, you will want to check for proper weights' directory and splitfile directory before training/testing the model.
+
+For training the model, you can use
+
+``` python3 i3d.py train FLOW```
+or
+``` python3 i3d.py train FRAME```
+
+For testing the model, you can use
+
+``` python3 i3d.py test ```
+
+### TSN
+
+Implementation of TSN is consists of 3 files:
+* *inception.py* : This file contains the implementation of InceptionV2ResNet model in Keras. Reason of using the source code of this model and not the Keras Functional API is to stack up multiple inception models as per our need for TSN model.
+* *pretrained-models.py* : This file contains the implementation of TSN model.
+* *tsn_implementation.py* : This file is the driver program for training/testing the model. It expects one command-line argument which is to mentioned whether to *'train'* or *'test'* the model.
+
+
+As mentioned above in the implementation of C3D, you will want to check for proper weights' directory and splitfile directory before training/testing the model.
+
+For training the model, you can use
+
+``` python3 tsn_implementation.py train ```
+
+For testing the model, you can use
+
+``` python3 tsn_implementation.py test ```
+
+One thing to note here is in Keras, the implementation of Batch Normalization layer is not providing correct behavior as it should have. This issue is addressed in this blog [here](https://blog.datumbox.com/the-batch-normalization-layer-of-keras-is-broken/). So, the model is trained by keeping the layer's training property as False (which is equivalent to NOT use Batch Normalization later at all). So, a better option to implement this model is to shift the architecture to some other framework ie PyTorch or Caffe (which is listed as future work on our part). 
