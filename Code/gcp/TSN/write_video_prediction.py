@@ -7,17 +7,17 @@ f.close()
 
 actions_map = {(int(line[0])-1):line[1] for line in lines}
 
-actions = [16,16,89,89]
-confidence = [0.26073313, 0.254037, 0.3055762, 0.35072905] 
+actions = [42,61,42,42,42,42]
+confidence = [0.68814725, 0.34163043, 0.43209386, 0.7391411, 0.8304755, 0.6209355] 
 confidence = [round(c*100,2) for c in confidence]
-videofile = r'E:\capstone_adbi_data\UCF-101\TableTennisShot\v_TableTennisShot_g21_c01.avi'
+videofile = r'E:\capstone_adbi_data\UCF-101\HulaHoop\v_HulaHoop_g12_c03.avi'
 
 cap = cv2.VideoCapture(videofile)
 fps = cap.get(cv2.CAP_PROP_FPS)
 width = int(cap.get(3))
 height = int(cap.get(4))
 
-out = cv2.VideoWriter('vid3.avi',cv2.VideoWriter_fourcc('M','J','P','G'), fps, (width,height))
+out = cv2.VideoWriter('vid1.avi',cv2.VideoWriter_fourcc('M','J','P','G'), fps, (width,height))
 
 if (cap.isOpened()== False): 
   print("Error opening video stream or file")
