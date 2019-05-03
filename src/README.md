@@ -87,7 +87,7 @@ Implementation of TSN is consists of 3 files:
 * *tsn_implementation.py* : This file is the driver program for training/testing the model. It expects one command-line argument which is to mentioned whether to *'train'* or *'test'* the model.
 
 
-As mentioned above in the implementation of C3D, you will want to check for proper weights' directory and splitfile directory before training/testing the model.
+As mentioned above in the implementation of C3D, you will want to check for proper weights' directory and splitfile directory before training/testing the model. For training the model, the weights will be downloaded automatically. For testing or training further, the weights are provided [here](trained_model_weights/tsn).
 
 For training the model, you can use
 
