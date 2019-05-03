@@ -13,6 +13,6 @@ The repository contains two directories: <br/>
 
 To give you an idea of the activity recognition, below is a video in which a predicted action is embedded along with model's confidence level. The prediction is made using C3D model. You can read more over [here](src/README.md).
 
-[![Watch](src/results/Video_Outputs/vid2.avi)]
+![Watch](src/results/Video_Outputs/vid2.avi)
 
 ### Please let us know if you have any comments or doubts.
