@@ -37,6 +37,7 @@ C3D's implementation consists of two files:
 1. *models.py*: This file contains the architecture of the model
 2. *vidc3d.py*: This file is the driver program for training/testing the model. It expects **one** command-line argument which is to mentioned whether to *'train'* or *'test'* the model.
     In order the run this file for training, it expects a pre-defined weights file which we have provided[ADD WEIGHT FILE IN REPO] [here](trained_model_weights/sports1M_weights_tf.h5). Once, you have the weights in your local system, give appropriate location in the script. After that, you also have to specify the location of your pre-processed videos, the splitfile to use for training in order to create a proper data generator for training. Once, all these steps are done, you can train the model by the following command.
+    
     ``` python3 vidc3d.py train ```
 
     In order to test the model over any specific video, you have to specify two things in the *test* function.
