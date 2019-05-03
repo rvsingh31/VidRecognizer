@@ -16,24 +16,27 @@ from keras.models import load_model
 from sklearn.metrics import confusion_matrix, accuracy_score
 
 
+# This is the base data generator
+# It will be used for fit_generator call in the model
 class dataGenerator(keras.utils.Sequence):
 
-    def __init__(self, filepath, batch_size, ffpath, segments = 3, test=False):
+    def __init__(self, filepath, batch_size, ffpath, test=False):
         np.random.seed(0)
-        self.filenames = list()
-        self.labels = list()
+        self.filenames = list() # filenames created after reading custom split file
+        self.labels = list() # all labels created after reading custom split file
         self.batch_size = batch_size
-        self.filepath = filepath
-        self.ffpath = ffpath
-        self.segments = segments
-        self.DS_FACTOR = 2
+        self.filepath = filepath # custom split file path
+        self.ffpath = ffpath # FramesFlows path
+        self.DS_FACTOR = 2 # since the input size of C3D pre-trained weights is 112x112 this si downscaling factor
         
+        # Open the custom split file and create video file names and labels
         with open(self.filepath,"r") as f:
             for line in f.readlines():
                 arr = line.split(" ")
                 self.filenames.append(arr[0])
                 self.labels.append(int(arr[1].strip()))
-        
+    
+        # shuffle the data initially
         length = len(self.filenames)
         self.idxs = np.random.permutation(length)
         
@@ -46,18 +49,19 @@ class dataGenerator(keras.utils.Sequence):
         batch_y = list()
         for each in this_batch:
             batch_x.append(self.filenames[each])
-            batch_y.append(self.labels[each])          
-        # batch_x = self.filenames[idx * self.batch_size:min((idx + 1) * self.batch_size, len(self.filenames))]
-        # batch_y = self.labels[idx * self.batch_size:min((idx + 1) * self.batch_size, len(self.filenames))]
+            batch_y.append(self.labels[each])
 
+        # we get all the frames here using the video filenames
         Xframes = list()
         Y = list()
         for index,each in enumerate(batch_x):
+            # read info text for class information
             infopath = os.path.join(self.ffpath,each,"info.txt")
             imgpath = os.path.join(self.ffpath,each,"frames")
             f = open(infopath,"r")
             total_frames = int(f.readlines()[0].strip().split(':')[1])
             f.close()
+            # 16 frames are picked per video, we sort it to stack in temporal order
             idxs = sorted(np.random.randint(0, total_frames, 16))
             Xframes.append(self.getFrames(idxs, imgpath))
             Y.append(batch_y[index])
@@ -66,6 +70,7 @@ class dataGenerator(keras.utils.Sequence):
         return (finalX,finalY)
     
     def getTestData(self):
+        # test data: this is exactly the same as getting the data, only thing is we do not fetch this in batches.
         batch_x = list()
         batch_y = list()
         for each in self.idxs:
@@ -143,11 +148,8 @@ def getTestDataForPrediction(filename, batch, ffpath):
     return finalX, ground_truth
 
 
+# custom test prediction on per video basis
 def test():
-    # filenameTest = "custom3Test.txt"
-    # ffpath = "FramesFlows/custom3"
-    # dgTest = dataGenerator(filenameTest, 16, ffpath)
-    #filenameTest = "GolfSwing/v_GolfSwing_g17_c01.avi"
     filenameTest = "TableTennisShot/v_TableTennisShot_g21_c01.avi"
     ffpath = "FramesFlows/custom3"
     X,y = getTestDataForPrediction(filenameTest, 16, ffpath)
@@ -157,6 +159,7 @@ def test():
     K.clear_session()
     _, model = finalC3D()
     
+    # load the best model we want to use for prediction.
     model.load_weights("weights/c3d/{}".format(saved_model_file))
     predictions = model.predict(X)        
     y_pred = K.argmax(predictions, 1)
@@ -168,6 +171,7 @@ def test():
 
 
 def main():
+    # create  data generator for both training and validation
     filenameTrain = "custom3Train.txt"
     filenameVal = "custom3Val.txt"
     ffpath = "FramesFlows/custom3"
@@ -177,15 +181,17 @@ def main():
     dgVal = dataGenerator(filenameVal, 16, ffpath)
 
 
-    #Create and Compile model
+    # Create and Compile model
     K.clear_session()
     base_model, model = finalC3D()
 
+    # pre-trained weights to be used for C3D
     model_file = "/mnt/disks/disk1/project/weights/c3d/sports1M_weights_tf.h5"
 
     np.random.seed(0)
     create_new = True
     lr = 0.0001
+    # use this if block if you want to start training on a previously trained model
     if not create_new and os.path.exists('c3d_model_checkpoints') and len(os.listdir("c3d_model_checkpoints")) > 0:
         print ("Found saved models")
         mydict = dict()
@@ -210,8 +216,8 @@ def main():
         #Fit generator
         history = model.fit_generator(dgTrain,initial_epoch = initial_epoch, epochs = 100,validation_data = dgVal, callbacks = callbacks_list)
 
+    # Use this block to train a new model
     else:
-
         sgd = SGD(lr=lr, momentum=0.9, nesterov=True)
 
         base_model.load_weights(model_file)

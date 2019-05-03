@@ -16,26 +16,28 @@ from sklearn.metrics import confusion_matrix, accuracy_score
 import gc
 
 
+# This is the base data generator
+# It will be used for fit_generator call in the model
 class dataGenerator(keras.utils.Sequence):
 
-    def __init__(self, filepath, batch_size, ffpath, test_batch_size=36, segments = 16, test=False, data_type="FRAME"):
+    def __init__(self, filepath, batch_size, ffpath, test_batch_size=36, test=False, data_type="FRAME"):
         np.random.seed(0)
-        self.filenames = list()
-        self.labels = list()
+        self.filenames = list() # filenames created after reading custom split file
+        self.labels = list() # all labels created after reading custom split file
         self.batch_size = batch_size
         self.test_batch_size = test_batch_size
-        self.filepath = filepath
-        self.ffpath = ffpath
-        self.segments = segments
-        self.DS_FACTOR = 1
-        self.DATA_TYPE = data_type
+        self.filepath = filepath # custom split file path
+        self.ffpath = ffpath # FramesFlows path
+        self.DATA_TYPE = data_type # FRAME or FLOW
         
+        # Open the custom split file and create video file names and labels
         with open(self.filepath,"r") as f:
             for line in f.readlines():
                 arr = line.split(" ")
                 self.filenames.append(arr[0])
                 self.labels.append(int(arr[1].strip()))
-        
+    
+        # shuffle the data initially
         length = len(self.filenames)
         self.idxs = np.random.permutation(length)
         
@@ -50,13 +52,16 @@ class dataGenerator(keras.utils.Sequence):
             batch_x.append(self.filenames[each])
             batch_y.append(self.labels[each])
 
+        # we get all the frames or flows here using the video filenames
         X = list()
         Y = list()
         for index,each in enumerate(batch_x):
+            # read info text for class information
             infopath = os.path.join(self.ffpath,each,"info.txt")
             f = open(infopath,"r")
             total_frames = int(f.readlines()[0].strip().split(':')[1])
             f.close()
+            # 16 frames/flow are picked per video, we sort it to stack in temporal order
             idxs = sorted(np.random.randint(1, total_frames, 16))
             if self.DATA_TYPE == "FRAME":
                 imgpath = os.path.join(self.ffpath,each,"frames")
@@ -121,6 +126,7 @@ class dataGenerator(keras.utils.Sequence):
         
         X = list()
         Y = list()
+        # we need to get data in batch for flows as it is very RAM intensive,
         for index,each in enumerate(batch_x):
             infopath = os.path.join(self.ffpath,each,"info.txt")
             f = open(infopath,"r")
@@ -174,6 +180,7 @@ def test():
     saved_model_frame = "weights-improvement-{}-{}.hdf5".format('23', '0.89')
     saved_model_flow = "weights-improvement-{}-{}.hdf5".format('37', '0.75')
 
+    # Predict for flow first, we do it in batches
     K.clear_session()
     _, modelFlow = finalI3D(input_shape=(16, 224, 224, 3))
     modelFlow.load_weights("i3d_model_checkpoints/flow/{}".format(saved_model_flow))
@@ -196,7 +203,8 @@ def test():
     del XFlow
     del modelFlow
     gc.collect()
-    
+
+    # Predict for Frame now
     K.clear_session()
     _, modelFrame = finalI3D(input_shape=(16, 224, 224, 3))
     modelFrame.load_weights("i3d_model_checkpoints/frame/{}".format(saved_model_frame))
@@ -214,7 +222,7 @@ def test():
     del modelFrame
     gc.collect()
 
-    
+    # Average the two outputs
     print("OVERALL")
     print(confusion_matrix(y_true, (y_pred_flow + y_pred_frame)//2))
     print(accuracy_score(y_true, (y_pred_flow + y_pred_frame)//2))
@@ -222,6 +230,7 @@ def test():
 
     
 def main(dtype="FRAME"):
+    # create  data generator for both training and validation
     filenameTrain = "custom3Train.txt"
     filenameVal = "custom3Val.txt"
     ffpath = "FramesFlows/custom3"
@@ -243,13 +252,11 @@ def main(dtype="FRAME"):
     lr = 0.1
     learning_rate = lr
     decay_rate = learning_rate / epochs
+    # use this if block if you want to start training on a previously trained model
     if not create_new and os.path.exists('i3d_model_checkpoints') and len(os.listdir("i3d_model_checkpoints")) > 0:
         print ("Found saved models")
-        #mydict = dict()
-        #sorted_files = sorted(os.listdir("i3d_model_checkpoints"), key = lambda x: int(x.split('-')[2]), reverse = True)
         saved_model = "i3d_model_checkpoints/flow/weights-improvement-37-0.75.hdf5"
         model.load_weights(saved_model)
-        #saved_model = sorted_files[0]
         initial_epoch = 37
 
         sgd = SGD(lr=lr, momentum=0.9, nesterov=True, decay=decay_rate)
@@ -268,8 +275,8 @@ def main(dtype="FRAME"):
         #Fit generator
         history = model.fit_generator(dgTrain,initial_epoch = initial_epoch, epochs = epochs,validation_data = dgVal, callbacks = callbacks_list)
 
+    # Use this block to train a new model
     else:
-
         sgd = SGD(lr=lr, momentum=0.9, nesterov=True, decay=decay_rate)
 
         model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
