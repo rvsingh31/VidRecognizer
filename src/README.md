@@ -1,3 +1,11 @@
+## Project Dependencies
+
+This project was executed on google cloud. The following script will install all the dependencies according to the system we had on GCP. We used python3.6 for development
+
+``` pip3 install requirements.txt ```
+
+Alternatively, if you opt to use Google Cloud for your research, you can use **Intel® optimized Deep Learning Image: TensorFlow 1.13.1 m25 (with Intel® MKL-DNN/MKL and CUDA 10.0)** image as boot disk in your compute engine to avoid installing all the requirements.
+
 ## Source Code (Developed using Keras with Tensorflow backend)
 
 The following is a brief description of the sub-directories present in this directory.
