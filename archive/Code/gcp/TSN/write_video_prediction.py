@@ -7,10 +7,10 @@ f.close()
 
 actions_map = {(int(line[0])-1):line[1] for line in lines}
 
-actions = [73, 73]
-confidence = [0.09910058, 0.4437373]
+actions = [64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64]
+confidence = [0.3218086, 0.30393335, 0.50292057, 0.3637636, 0.6533337, 0.51918936, 0.24666283, 0.23461409, 0.43313158, 0.32986924, 0.42131943, 0.35405362, 0.3364, 0.40841392, 0.4567551, 0.27676046, 0.3317784, 0.6036323, 0.757768, 0.5641499, 0.59122604, 0.68902344, 0.4566407, 0.5313914, 0.54710686]
 confidence = [round(c*100,2) for c in confidence]
-videofile = r'E:\NCSU drive\Sem 2\ADBI\Capstone Project\test3.mp4'
+videofile = r'E:\capstone_adbi_data\UCF-101\PlayingSitar\v_PlayingSitar_g05_c01.avi'
 
 cap = cv2.VideoCapture(videofile)
 fps = cap.get(cv2.CAP_PROP_FPS)
