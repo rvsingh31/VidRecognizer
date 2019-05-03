@@ -67,7 +67,7 @@ Implementation of I3D consists of two files:
 	*  First argument is to mention whether to *'train'* or *'test'* the model.
 	* Second argument is optional in case of testing. For training,  you need to specify what part of video to train on ie. *'FLOW'* or *'FRAME'*.
 
-As mentioned above in the implementation of C3D, you will want to check for proper weights' directory and splitfile directory before training/testing the model.
+As mentioned above in the implementation of C3D, you will want to check for proper weights' directory and splitfile directory before training/testing the model. For testing or training further, the weights are provided [here](trained_model_weights/i3d).
 
 For training the model, you can use
 
