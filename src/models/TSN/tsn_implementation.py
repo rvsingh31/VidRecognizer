@@ -13,10 +13,11 @@ from keras import backend as K
 from keras.callbacks import EarlyStopping, ModelCheckpoint, CSVLogger
 from sklearn.metrics import accuracy_score
 
-
+#Data generator used to feed the model with data tuple (X,y)
 class dataGenerator(keras.utils.Sequence):
 
     def __init__(self, filepath, batch_size, ffpath, segments = 3, test=False):
+        #Initialize the generator with the arguments passed
         np.random.seed(0)
         self.filenames = list()
         self.labels = list()
@@ -25,6 +26,7 @@ class dataGenerator(keras.utils.Sequence):
         self.ffpath = ffpath
         self.segments = segments
         
+        #Read and keep all the names of the videos for creating dataframe
         with open(self.filepath,"r") as f:
             for line in f.readlines():
                 arr = line.split(" ")
@@ -38,19 +40,20 @@ class dataGenerator(keras.utils.Sequence):
         return len(self.filenames)//self.batch_size
 
     def __getitem__(self, idx):
+        #create a batch as per the sequence call to feed to the model
         this_batch = self.idxs[idx * self.batch_size:min((idx + 1) * self.batch_size, len(self.filenames))]
         batch_x = list()
         batch_y = list()
         for each in this_batch:
             batch_x.append(self.filenames[each])
             batch_y.append(self.labels[each])          
-        # batch_x = self.filenames[idx * self.batch_size:min((idx + 1) * self.batch_size, len(self.filenames))]
-        # batch_y = self.labels[idx * self.batch_size:min((idx + 1) * self.batch_size, len(self.filenames))]
-
+        
+        #get frames and flows for this batch
         Xframes = defaultdict(list)
         Y = list()
         Xflows = defaultdict(list)
         for index,each in enumerate(batch_x):
+            #read info for each video
             infopath = os.path.join(self.ffpath,each,"info.txt")
             imgpath = os.path.join(self.ffpath,each,"frames")
             flowspath = os.path.join(self.ffpath,each,"flows")
@@ -68,16 +71,20 @@ class dataGenerator(keras.utils.Sequence):
             frames = self.getFrames(idxs, imgpath)
             flows = self.getFlows(idxs, flowspath)
             
+            #create input specific to segments used in the model. In our case, 3
             for i in range(len(frames)):
                 Xframes[i%self.segments].append(frames[i])
                         
             for i in range(len(flows)):
                 Xflows[i%self.segments].append(flows[i])
-                
+            
+            #create labels dataframe
             Y.extend([batch_y[index]]*(num_frames))
             
         finalX = dict()
         i = 1
+
+        #concatenate the input, output and form a dictionary
         for key in Xframes.keys():
             finalX['input_'+str(i)] = np.array(Xframes[key])
             i += 1
@@ -89,6 +96,7 @@ class dataGenerator(keras.utils.Sequence):
 
         return (finalX,finalY)
     
+    #to fetch all the test data. To be used only with test data generator
     def getTestData(self):
         batch_x = list()
         batch_y = list()
@@ -138,7 +146,7 @@ class dataGenerator(keras.utils.Sequence):
 
         return (finalX,finalY)
 
-
+    # perform one hot encoding of the labels
     def one_hot_encode(self,data, classes = 101):
         """
         :param data: data to be one hot encoded
@@ -148,7 +156,7 @@ class dataGenerator(keras.utils.Sequence):
         labels[np.arange(data.size), data - 1] = 1
         return labels
 
-
+    #method to extract flows for each video from the disk
     def getFlows(self,idxs, flowspath):
 
         stack = list()
@@ -163,6 +171,7 @@ class dataGenerator(keras.utils.Sequence):
             
         return np.array(stack)
     
+    #read image for each video
     def readImg(self,path, type = "frames"):
         img = cv2.imread(path)
         if type == "frames":
@@ -172,7 +181,7 @@ class dataGenerator(keras.utils.Sequence):
         img = resize(img,(img.shape[0],img.shape[1],1))
         return img
     
-    
+    #method to extract frames for each video from the disk
     def getFrames(self,idxs, imgpath):
 
         stack = list()
@@ -185,13 +194,17 @@ class dataGenerator(keras.utils.Sequence):
 
 np.random.seed(0)
 
+# read the command line argument and create the flow accordingly
 if len(sys.argv) > 1:
 
+    # Provide filenames for train, val, test set
     filenameTrain = "custom3Train.txt"
     filenameVal = "custom3Val.txt"
     filenameTest = "custom3Test.txt"
+    #Path where all the frames, flows are stored
     ffpath = "FramesFlows/custom3"
 
+    #initialize the generators
     dgTrain = dataGenerator(filenameTrain,16,ffpath)
     dgVal = dataGenerator(filenameVal,16,ffpath)
     dgTest = dataGenerator(filenameTest, 1, ffpath)
@@ -202,6 +215,7 @@ if len(sys.argv) > 1:
 
     #Test or Train
     if sys.argv[1] == "train":
+        #Resume training from a checkpoint
         if os.path.exists('tsn_model_checkpoints') and len(os.listdir("tsn_model_checkpoints")) > 0:
             print ("Found saved models")
             mydict = dict()
@@ -210,6 +224,7 @@ if len(sys.argv) > 1:
             initial_epoch = int(saved_model.split('-')[2])
             model.load_weights(os.path.join("tsn_model_checkpoints",saved_model))
             
+            # recompile model with saved weights
             model.compile(optimizer= keras.optimizers.Adam(lr=0.0001), loss='categorical_crossentropy', metrics=['accuracy'])
             csv_logger = CSVLogger('tsn_training.log')
             #Checkpointing
@@ -222,11 +237,11 @@ if len(sys.argv) > 1:
             print (initial_epoch)
             print (saved_model)
             
-            #Fit generatoro
+            #Fit generator
             history = model.fit_generator(dgTrain,initial_epoch = initial_epoch, epochs = 100,validation_data = dgVal, callbacks = callbacks_list)
 
         else:
-
+            #compile the model for starting the training
             model.compile(optimizer= keras.optimizers.Adam(lr=0.0001), loss='categorical_crossentropy', metrics=['accuracy'])
             csv_logger = CSVLogger('tsn_training.log')
             #Checkpointing
@@ -235,11 +250,13 @@ if len(sys.argv) > 1:
             # es = EarlyStopping(monitor='val_acc', mode='max', min_delta=1, patience = 10)
             # callbacks_list = [checkpoint,es]
             callbacks_list = [checkpoint, csv_logger]
-
+            
+            #fit the model
             history = model.fit_generator(dgTrain, epochs = 50,validation_data = dgVal, callbacks = callbacks_list)
 
     else:
-
+        
+        # test the model for test set
         if os.path.exists('tsn_model_checkpoints') and len(os.listdir("tsn_model_checkpoints")) > 0:
             print ("Found saved models")
             mydict = dict()
