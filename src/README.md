@@ -42,7 +42,7 @@ Our biggest challenge was to work on such a big dataset with limited resources w
 
 ## Running the models' scripts
 
-As mentioned before, we implemented three models. Out of which, we were able to train two models successfully given the timeframe we had and multiple implementation issues we faced, the reasons of which can be found in our project report[ADD REPORT IN REPO] [here](../Report.pdf).
+As mentioned before, we implemented three models. Out of which, we were able to train two models successfully given the timeframe we had and multiple implementation issues we faced, the reasons of which can be found in our project report [here](report_and_presentation/Report.pdf).
 
 ### C3D
 
