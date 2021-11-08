@@ -115,7 +115,7 @@ mkl-random==1.0.1.1
 mock==2.0.0
 mpmath==1.1.0
 nbconvert==5.4.1
-nbdime==1.0.5
+nbdime==1.1.1
 nbformat==4.4.0
 networkx==2.3
 nltk==3.4.1
