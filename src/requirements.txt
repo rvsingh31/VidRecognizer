@@ -71,7 +71,7 @@ idna==2.8
 imageio==2.5.0
 intel-openmp==2019.0
 ipykernel==5.1.0
-ipython==7.4.0
+ipython==7.16.3
 ipython-genutils==0.2.0
 ipython-sql==0.3.9
 ipywidgets==7.4.2
